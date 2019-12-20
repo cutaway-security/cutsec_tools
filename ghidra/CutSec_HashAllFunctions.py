@@ -59,10 +59,17 @@ def getFuncHash(f):
 if __name__== "__main__":
     if DEBUG > 0: print("%s: %s"%(progname,scriptname))
 
+    # Write results to a file because the output can be too long for Jython Console
+    onf = askFile("Select file for output.","Save")
+    ONF = open(onf.getAbsolutePath(),'w')
+
     # Get all functions for the current file
     funcs = getFunctions()
 
     # Hash functions and print hash
     for e in funcs:
         ehash = getFuncHash(e)
-        print("%s:%s:%s"%(progname,e.name,ehash))
+        print("%s:%s:%s:%s"%(progname,e.name,e.getEntryPoint(),ehash))
+        ONF.write("%s:%s:%s:%s"%(progname,e.name,e.getEntryPoint(),ehash))
+
+    ONF.close()

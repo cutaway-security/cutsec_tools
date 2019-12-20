@@ -10,8 +10,6 @@ import ghidra.feature.fid.hash.FidHashQuad as FHQ
 import ghidra.feature.fid.service.FidService as FidService
 import ghidra.program.model.listing.Function
 
-
-
 ##########################
 # Global variables
 ##########################
@@ -59,6 +57,10 @@ def getFuncHash(f):
 if __name__== "__main__":
     if DEBUG > 0: print("%s: %s"%(progname,scriptname))
 
+    # Write results to a file because the output can be too long for Jython Console
+    onf = askFile("Select file for output.","Save")
+    ONF = open(onf.getAbsolutePath(),'w')
+
     # hashes = {hash:["file:function_name"]}
     hashes = {}
 
@@ -70,7 +72,7 @@ if __name__== "__main__":
 
     # Process each file and get programs
     for f in files:
-        # FIXME: Using 'x' for the Consumer variable here. Not sure how to do this properly.
+        # FIXME: This is a hack. Using 'x' for the Consumer variable here. Not sure how to do this properly.
         p = f.getDomainObject('x',1,1,monitor)
 
         pname = p.getName()
@@ -78,16 +80,14 @@ if __name__== "__main__":
 
         # Get functions
         funcs = fm.getFunctions(True)
-        #if DEBUG > 0: print("Number of functions in %s: %d"%(pname,len(funcs)))
 
         # Hash functions and print hash
         for e in funcs:
             ehash = getFuncHash(e)
             if ehash in hashes.keys():
-                hashes[ehash].append("%s:%s"%(pname,e.name))
+                hashes[ehash].append("%s:%s:%s"%(pname,e.name,e.getEntryPoint()))
             else:
-                hashes[ehash] = ["%s:%s"%(pname,e.name)]
-            #print("%s:%s:%s"%(pname,e.name,ehash))
+                hashes[ehash] = ["%s:%s:%s"%(pname,e.name,e.getEntryPoint())]
         p.release('x')
 
     # Print Collisions
@@ -98,5 +98,8 @@ if __name__== "__main__":
     for k in hashes.keys():
         if len(hashes[k]) > 1:
             print("%s:"%k)
+            ONF.write("%s:\n"%k)
             for e in hashes[k]:
                 print("%s%s"%(tab*1,e))   
+                ONF.write("%s%s\n"%(tab*1,e))
+    ONF.close()

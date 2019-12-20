@@ -59,6 +59,10 @@ def getFuncHash(f):
 if __name__== "__main__":
     if DEBUG > 0: print("%s: %s"%(progname,scriptname))
 
+    # Write results to a file because the output can be too long for Jython Console
+    onf = askFile("Select file for output.","Save")
+    ONF = open(onf.getAbsolutePath(),'w')
+
     # Select a project folder to run everything on
     folder = askProjectFolder("Select Project Folder:")
 
@@ -81,6 +85,8 @@ if __name__== "__main__":
         for e in funcs:
             ehash = getFuncHash(e)
             print("%s:%s:%s"%(pname,e.name,ehash))
+            ONF.write("%s:%s:%s"%(pname,e.name,ehash))
         p.release('x')
 
+    ONF.close()
 
