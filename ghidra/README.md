@@ -1,5 +1,5 @@
 # Ghidra Scripts
-Python scripts to do actions in Ghidra via script manager
+Python scripts to do actions in Ghidra via script manager. These scripts should be stored in your Ghidra scripts directory. See Ghidra documentation for the approprate locations.
 
 # Hash all functions from multiple programs
 CutSec_HashAllFunctionMultiFile.py 
