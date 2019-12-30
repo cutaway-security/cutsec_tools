@@ -54,6 +54,7 @@ def getFuncHash(f):
         return "***"
     else:
         #return fhash.toString()
+        # Some values will be negative. Make them positive.
         return hex(fhash.getFullHash() & 0xffffffffffffffff)[2:-1]
 
 if __name__== "__main__":

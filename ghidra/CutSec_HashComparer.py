@@ -52,6 +52,7 @@ def getFuncHash(f):
         return "***"
     else:
         #return fhash.toString()
+        # Some values will be negative. Make them positive.
         return hex(fhash.getFullHash() & 0xffffffffffffffff)[2:-1]
 
 if __name__== "__main__":
@@ -84,10 +85,13 @@ if __name__== "__main__":
         # Hash functions and print hash
         for e in funcs:
             ehash = getFuncHash(e)
+            entP = e.getEntryPoint()
+            cnt_ref_objects = len(getReferencesTo(entP))
+            # return program name, function name, function entry point, count of references to function
             if ehash in hashes.keys():
-                hashes[ehash].append("%s:%s:%s"%(pname,e.name,e.getEntryPoint()))
+                hashes[ehash].append("%s:%s:%s:%s"%(pname,e.name,entP,cnt_ref_objects))
             else:
-                hashes[ehash] = ["%s:%s:%s"%(pname,e.name,e.getEntryPoint())]
+                hashes[ehash] = ["%s:%s:%s:%s"%(pname,e.name,entP,cnt_ref_objects)]
         p.release('x')
 
     # Print Collisions

@@ -1,21 +1,21 @@
-#Hash all functions and return "Func name:fullHash". Unhashable functions return "***" as hash.
+#Identify functions that are never called by other functions.
 #@author Don C. Weber (@cutaway)
-#@category FunctionID
+#@category References
 #@keybinding 
 #@menupath 
 #@toolbar 
 
 import ghidra.app.script.GhidraScript as GS
+import ghidra.program.model.listing.Function
 import ghidra.feature.fid.hash.FidHashQuad as FHQ
 import ghidra.feature.fid.service.FidService as FidService
-import ghidra.program.model.listing.Function
 
 ##########################
 # Global variables
 ##########################
 DEBUG = 0
 progname = currentProgram.getName()
-scriptname = "Hash All Functions"
+scriptname = "Zero Referenced Functions"
 
 ##########################
 # Processing Functions
@@ -58,17 +58,25 @@ def getFuncHash(f):
 if __name__== "__main__":
     if DEBUG > 0: print("%s: %s"%(progname,scriptname))
 
-    # Write results to a file because the output can be too long for Jython Console
-    onf = askFile("Select file for output.","Save")
-    ONF = open(onf.getAbsolutePath(),'w')
-
     # Get all functions for the current file
     funcs = getFunctions()
 
-    # Hash functions and print hash
+    # Check function for references storing count
+    refs = {}
+    max_refs = 1
     for e in funcs:
-        ehash = getFuncHash(e)
-        print("%s:%s:%s:%s"%(progname,e.name,e.getEntryPoint(),ehash))
-        ONF.write("%s:%s:%s:%s"%(progname,e.name,e.getEntryPoint(),ehash))
+        func_name = "%s:%s"%(e.name,e.getEntryPoint())
+        entP = e.getEntryPoint()
+        # Size of function comes from the Max (plus one to get last byte) and Min address of the function body
+        fsize = (int(e.getBody().getMaxAddress().toString(),16) + 1) - int(e.getBody().getMinAddress().toString(),16)
+        if len(getReferencesTo(entP)) < 1:
+            ehash = getFuncHash(e)
+            refs[func_name] = [fsize,ehash]
 
-    ONF.close()
+    # Convert to reverse sorted Tuple
+    print("Program name, Function name, Function Entry Point, Function Hash, Function Byte Size")
+    sorted_refs = sorted(refs.items(),key=lambda x:x[1][0],reverse=True)
+    for e in sorted_refs:
+        # Print output to console
+        print("%s:%s:%s:%s"%(progname,e[0],e[1][1],e[1][0]))
+
