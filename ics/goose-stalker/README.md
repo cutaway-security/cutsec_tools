@@ -1,13 +1,11 @@
 # Goose-Stalker
-====================
 
 ## Purpose
-====================
+
 Goose-Stalker is a project to analyze and interact with Ethernet types associated with IEC 61850. Currently, the project is focused on Ethernet type 0x88b8 as published by the [goose-IEC61850-scapy](https://github.com/mdehus/goose-IEC61850-scapy). The project has morphed significantly and the direction is to progress this even further.
 
-
 ## Modules and Scripts
-====================
+
 * goose.py - Scapy layers to analyze packets (see TODO)
 * BER.py - modified version of original project's Basic Encoding Rules (BER). NOTE: this needs to be moved to using Scapy's ASN.1 / BER functionality (see TODO list).
 * test_goose.py - script to test the Scapy layers and parsing. Needs to be migrated to an analysis script to output details about devices on the network (See TODO list).
@@ -16,9 +14,7 @@ Goose-Stalker is a project to analyze and interact with Ethernet types associate
 * LICENSE - maintained the [goose-IEC61850-scapy](https://github.com/mdehus/goose-IEC61850-scapy)'s original license (see TODO list).
 * Pipfile - required Python modules. Probably contains a few more than necessary. See requirements below.
 
-
 ## Requirements and Installation
-====================
 
 * [Pipenv](https://docs.pipenv.org/) - Pipfile should contain all required packages, to include a few nice-to-haves.
   * [Scapy](https://github.com/secdev/scapy) - comes with its own set of required packages
@@ -30,7 +26,6 @@ Goose-Stalker is a project to analyze and interact with Ethernet types associate
 * Admin Privileges - you'll need administrative privileges to capture and resend data on your system's network interface. 
 
 ## TODO
-====================
 
 * goose.py: [Scapy](https://github.com/secdev/scapy) provides modules that handle OSI's Abstract Syntax Notation One (ASN.1) and Basic Encoding Rules (BER). This is not currently used by this project. It needs to be migrated to using these modules.
 * goose.py: Goose packets can be send with or without VLAN tags (Dot1Q). Layer binding needs to be updated to handle this appropriately.
@@ -43,7 +38,7 @@ Goose-Stalker is a project to analyze and interact with Ethernet types associate
 * LICENSE - should and can the license file be updated to a more current version of open source license?
 
 # goose-IEC61850-scapy
-====================
+
 This project was originally forked from the [goose-IEC61850-scapy](https://github.com/mdehus/goose-IEC61850-scapy) project. It has morphed significantly and, thus, it is being moved to a new project. 
 
 > The Generic Object Oriented Substation Events (GOOSE) protocol is defined in IEC 61850 for the purpose of distributing event data across entire substation networks.  The code in this project can be used to provide assistance in decoding / encoding GOOSE packets in a programmatic way.
