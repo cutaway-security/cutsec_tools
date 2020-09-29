@@ -35,13 +35,15 @@ def signal_handler(sig,frame):
     print('Manual interrupt captured: cntl-c')
     sys.exit()
 
-def timeToString(t):
+def timeStrFrom64bits(t):
+    # Microsecond Resolution Ignored
     if args.DEBUG: print('In timeToString')
     time32Int = int.from_bytes(t[:4],'big')
     time32Str = datetime.fromtimestamp(time32Int).strftime('%Y-%m-%d %H:%M:%S')
     return time32Str
 
-def curTimeBytes(utc=False):
+def curTime64Bits(utc=False):
+    # Microsecond Resolution Ignored
     if args.DEBUG: print('In curTimeBytes')
     if utc:
         curTime = time.mktime(datetime.utcnow().timetuple())
