@@ -1,0 +1,23 @@
+###########################################
+# Name: ICSV-prevent-modbus-write.filter
+# Description: ICS Village Ettercap Filter 
+#              for preventing Modbus writes
+#
+# Created by: Don C. Weber (@cutaway)
+# Date Created: January 2021
+# Version: 0.1
+###########################################
+
+# Checking to see if the source is the PLC and the protocol is Modbus
+# Note: The IP address will need to be updated for your PLC
+if (ip.dst == '192.168.0.21' && tcp.dst == 502) {
+
+	# Test for Write Modbus Coils 0x05, Registers 0x06, Multiple 0x15, and Read/Write 0x16 Message. 
+    if (DATA.data + 7 == "\x05" || DATA.data + 7 == "\x06" || DATA.data + 7 == "\x15" || DATA.data + 7 == "\x16"){
+        # Drop write packet
+        drop();
+    	# Printing a message when the filter fires.
+    	msg("Dropped Modbus Write Message");
+    }
+}
+
