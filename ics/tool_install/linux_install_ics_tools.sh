@@ -51,7 +51,7 @@ PIP_MODULES='
     paramiko
     beautifulsoup4
     pysnmp
-    gnureadline
+    readline
     python-nmap
     nmap
     scapy
@@ -109,9 +109,10 @@ make
 cd $TOOLDIR/isf
 pipenv --two install -r requirements.txt
 echo 'pipenv run ./isf.py' > isf_RUNME_PIPENV.sh
+chmod 755 isf_RUNME_PIPENV.sh
 
 # Added Path Update to ~/.zshrc or ~/.bashrc
-SHELL='~/.bashrc'
+SHELL=$HOME'/.bashrc'
 #SHELL='~/.zshrc'
 echo '# Update Path for local software' >> $SHELL
 echo 'PATH=~/.local/bin:~/.cargo/bin:$PATH' >> $SHELL
