@@ -9,9 +9,9 @@ echo 'WARNING: No warranty or guarantee these tools are secure or do not contain
 echo 'WARNING: Check all installed software on your own before use.'
 echo 'WARNING: USE AT YOUR OWN RISK.'
 echo
-read -n1 -s -r -p $'Press Enter to continue...\n' key
+read -n1 -s -r -p $'Press Y to continue...\n' key
 
-if [ "$key" = '' ]; then
+if [ "$key" = 'Y' ]; then
     echo 'Excellent.... Continuing... Enjoy....'
 else
     echo 'Exiting....'
