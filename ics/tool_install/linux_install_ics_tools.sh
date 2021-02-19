@@ -32,12 +32,15 @@ sudo apt update && sudo apt -y dist-upgrade
 echo 'Apt Install Required Programs'
 PYTHON_MODULES='
     python3-pip
+    python2
+    pipenv
     cmake
     git
     rustc
+    vim
 '
 
-apt -y install $PYTHON_MODULES
+sudo apt -y install $PYTHON_MODULES
 
 # Install Python Modules
 ## Requirements
@@ -95,6 +98,7 @@ ICS_GIT_TOOLS='
     https://github.com/dark-lbp/isf.git 
 '
 
+cd $TOOLDIR
 for i in $ICS_GIT_TOOLS; do git clone $i; done 
 
 # Build Compiled Tools
@@ -102,6 +106,9 @@ cd  $TOOLDIR/libiec61850/examples
 make
 cd  $TOOLDIR/IEC61850ToolChain
 make
+cd $TOOLDIR/isf
+pipenv --two install -r requirements.txt
+echo 'pipenv run ./isf.py' > isf_RUNME_PIPENV.sh
 
 # Added Path Update to ~/.zshrc or ~/.bashrc
 SHELL='~/.bashrc'
