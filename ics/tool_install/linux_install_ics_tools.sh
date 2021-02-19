@@ -51,7 +51,6 @@ PIP_MODULES='
     paramiko
     beautifulsoup4
     pysnmp
-    readline
     python-nmap
     nmap
     scapy
@@ -59,6 +58,7 @@ PIP_MODULES='
     serial
     cryptography
     lxml
+    testresources
 '
 
 pip3 install $PIP_MODULES
@@ -112,10 +112,17 @@ echo 'pipenv run ./isf.py' > isf_RUNME_PIPENV.sh
 chmod 755 isf_RUNME_PIPENV.sh
 
 # Added Path Update to ~/.zshrc or ~/.bashrc
-SHELL=$HOME'/.bashrc'
-#SHELL='~/.zshrc'
-echo '# Update Path for local software' >> $SHELL
-echo 'PATH=~/.local/bin:~/.cargo/bin:$PATH' >> $SHELL
+SHFILE='
+    bashrc
+    zshrc
+'
+for e in $SHFILE; do
+    SHELL=$HOME'/.'$e;
+    if [ -f $SHELL ]; then
+        echo '# Update Path for local software' >> $SHELL;
+        echo 'PATH=~/.local/bin:~/.cargo/bin:$PATH' >> $SHELL;
+    fi
+done
 
 # Complete
 echo 'ICS Tools Installed. Happy Hunting....'
