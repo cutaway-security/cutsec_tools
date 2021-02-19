@@ -26,7 +26,7 @@ mkdir -p $TOOLDIR
 
 # Update 
 echo 'Updating System Packages'
-sudo apt update && sudo apt dist-upgrade
+sudo apt update && sudo apt -y dist-upgrade
 
 # Be sure Python3 Pip and other packages are installed
 echo 'Apt Install Required Programs'
@@ -37,7 +37,7 @@ PYTHON_MODULES='
     rustc
 '
 
-apt install $PYTHON_MODULES
+apt -y install $PYTHON_MODULES
 
 # Install Python Modules
 ## Requirements
