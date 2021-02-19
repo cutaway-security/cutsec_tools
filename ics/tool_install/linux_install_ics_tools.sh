@@ -9,9 +9,9 @@ echo 'WARNING: No warranty or guarantee these tools are secure or do not contain
 echo 'WARNING: Check all installed software on your own before use.'
 echo 'WARNING: USE AT YOUR OWN RISK.'
 echo
-read -n1 -s -r -p $'Press space to continue...\n' key
+read -n1 -s -r -p $'Press Enter to continue...\n' key
 
-if [ "$key" = ' ' ]; then
+if [ "$key" = '' ]; then
     echo 'Excellent.... Continuing... Enjoy....'
 else
     echo 'Exiting....'
@@ -21,7 +21,7 @@ fi
 # Change to User's Home directory and create Tools Dir
 echo 'Generating ICS Tools Directory at ~/Tools/ics-tools'
 cd ~
-TOOLDIR='~/Tools/ics-tools'
+TOOLDIR=$HOME'/Tools/ics-tools'
 mkdir -p $TOOLDIR
 
 # Update 
@@ -31,7 +31,6 @@ sudo apt update && sudo apt dist-upgrade
 # Be sure Python3 Pip and other packages are installed
 echo 'Apt Install Required Programs'
 PYTHON_MODULES='
-    python-pip
     python3-pip
     cmake
     git
@@ -59,7 +58,6 @@ PIP_MODULES='
     lxml
 '
 
-pip install $PIP_MODULES
 pip3 install $PIP_MODULES
 
 ## ICS Tools
@@ -74,7 +72,7 @@ PIP_ICS_TOOLS='
     python-snap7
 '
 
-pip install $PIP_ICS_TOOLS
+pip3 install $PIP_ICS_TOOLS
 
 # Install Rust Modules
 echo 'Rust Cargo install ICS Tools'
@@ -84,7 +82,7 @@ RUST_ICS_TOOLS='
 cargo install $RUST_ICS_TOOLS
 
 # Git clone ICS Tools
-ICS_GIT_TOOLS ='
+ICS_GIT_TOOLS='
     https://github.com/cutaway-security/chaps.git
     https://github.com/cutaway-security/cutsec_tools.git
     https://github.com/mz-automation/libiec61850.git
