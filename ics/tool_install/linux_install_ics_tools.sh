@@ -1,8 +1,4 @@
 #!/bin/bash
-if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root for package updates and install." 
-   exit 1
-fi
 
 # Details
 echo 'Install Common ICS Tools on Linux Systems'
@@ -25,12 +21,12 @@ fi
 # Change to User's Home directory and create Tools Dir
 echo 'Generating ICS Tools Directory at ~/Tools/ics-tools'
 cd ~
-TOOLDIR='./Tools/ics-tools'
+TOOLDIR='~/Tools/ics-tools'
 mkdir -p $TOOLDIR
 
 # Update 
 echo 'Updating System Packages'
-apt update && apt dist-upgrade
+sudo apt update && sudo apt dist-upgrade
 
 # Be sure Python3 Pip and other packages are installed
 echo 'Apt Install Required Programs'
