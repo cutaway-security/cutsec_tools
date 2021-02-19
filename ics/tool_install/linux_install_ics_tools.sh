@@ -1,10 +1,8 @@
-#!/bin/zsh
+#!/bin/bash
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root for package updates and install." 
    exit 1
 fi
-
-pause() read -s -k "?$*"$'\n'
 
 # Details
 echo 'Install Common ICS Tools on Linux Systems'
@@ -15,7 +13,14 @@ echo 'WARNING: No warranty or guarantee these tools are secure or do not contain
 echo 'WARNING: Check all installed software on your own before use.'
 echo 'WARNING: USE AT YOUR OWN RISK.'
 echo
-pause "Cntl-C to Exit. Press Any Key To Continue: "
+read -n1 -s -r -p $'Press space to continue...\n' key
+
+if [ "$key" = ' ' ]; then
+    echo 'Excellent.... Continuing... Enjoy....'
+else
+    echo 'Exiting....'
+    exit 0
+fi
 
 # Change to User's Home directory and create Tools Dir
 echo 'Generating ICS Tools Directory at ~/Tools/ics-tools'
@@ -29,66 +34,72 @@ apt update && apt dist-upgrade
 
 # Be sure Python3 Pip and other packages are installed
 echo 'Apt Install Required Programs'
-PYTHON_MODULES= \
-    python3-pip \
-    cmake \
-    git \
+PYTHON_MODULES='
+    python-pip
+    python3-pip
+    cmake
+    git
     rustc
+'
 
 apt install $PYTHON_MODULES
 
 # Install Python Modules
 ## Requirements
 echo 'Pip install Tool Required Python Modules'
-PIP_MODULES= \
-    ipython \
-    requests \
-    paramiko \
-    beautifulsoup4 \
-    pysnmp \
-    gnureadline \
-    python-nmap \
-    nmap \
-    scapy \
-    usb \
-    serial \
-    cryptography \
+PIP_MODULES='
+    ipython
+    requests
+    paramiko
+    beautifulsoup4
+    pysnmp
+    gnureadline
+    python-nmap
+    nmap
+    scapy
+    usb
+    serial
+    cryptography
     lxml
+'
 
 pip install $PIP_MODULES
+pip3 install $PIP_MODULES
 
 ## ICS Tools
 echo 'Pip install ICS Tools'
-PIP_ICS_TOOLS= \
-    pymodbus \
-    bacpypes \
-    cpppo \
-    pycomm \
-    opcua \
-    opcua-client \
+PIP_ICS_TOOLS='
+    pymodbus
+    bacpypes
+    cpppo
+    pycomm
+    opcua
+    opcua-client
     python-snap7
+'
 
 pip install $PIP_ICS_TOOLS
 
 # Install Rust Modules
 echo 'Rust Cargo install ICS Tools'
-RUST_ICS_TOOLS= \
+RUST_ICS_TOOLS='
     rodbus-client
-
+'
 cargo install $RUST_ICS_TOOLS
 
 # Git clone ICS Tools
-ICS_GIT_TOOLS = \
-    https://github.com/cutaway-security/chaps.git \
-    https://github.com/cutaway-security/cutsec_tools.git \
+ICS_GIT_TOOLS ='
+    https://github.com/cutaway-security/chaps.git
+    https://github.com/cutaway-security/cutsec_tools.git
     https://github.com/mz-automation/libiec61850.git
     https://github.com/smartgridadsc/IEC61850ToolChain.git
-    https://github.com/devkid/profinet.git \ 
-    https://github.com/Chowdery/SCADA-Profinet_Network-Attack.git \
-    https://github.com/atimorin/scada-tools.git \
-    https://github.com/jpalanco/nmap-scada.git \ 
-    https://github.com/digitalbond/Redpoint.git \
-    https://github.com/dark-lbp/isf.git \ 
+    https://github.com/devkid/profinet.git 
+    https://github.com/Chowdery/SCADA-Profinet_Network-Attack.git
+    https://github.com/atimorin/scada-tools.git
+    https://github.com/jpalanco/nmap-scada.git 
+    https://github.com/digitalbond/Redpoint.git
+    https://github.com/dark-lbp/isf.git 
+'
 
 for i in $ICS_GIT_TOOLS; do git clone $i; done 
 
@@ -99,8 +110,8 @@ cd  $TOOLDIR/IEC61850ToolChain
 make
 
 # Added Path Update to ~/.zshrc or ~/.bashrc
-#SHELL='~/.bashrc'
-SHELL='~/.zshrc'
+SHELL='~/.bashrc'
+#SHELL='~/.zshrc'
 echo '# Update Path for local software' >> $SHELL
 echo 'PATH=~/.local/bin:~/.cargo/bin:$PATH' >> $SHELL
 
