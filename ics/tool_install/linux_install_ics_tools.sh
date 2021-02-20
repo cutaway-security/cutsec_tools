@@ -22,6 +22,7 @@
 ### TODO: PIP modules
 ### TODO: PIP ICS modules
 ### TODO: GitHub Repos
+## TODO: Fix Zeek Package install of Amazon packages
 ##########
 
 ##########
@@ -216,7 +217,7 @@ declare -A ZARRAY=()
 
 # Search each protocol for a Zeek Package
 for NAME in $ICS_PROTOCOLS; do 
-    ZPKG=`zkg search $NAME | grep -v 'no matches' | cut -d' ' -f1 | cut -d'/' -f3`
+    ZPKG=`zkg search $NAME | grep -v -e 'no matches' -e test | cut -d' ' -f1 | cut -d'/' -f3`
     for NP in $ZPKG; do
         # Use Associative Array to generate unique list of names 
         ZARRAY[$NP]=1;
@@ -226,11 +227,11 @@ done
 # Loop through array and install packages
 for PKG in ${!ZARRAY[@]}; do
     echo $INSTALL_COMMENT'Installing Zeek Package: '$PKG
-    zkg install --force --skiptests $PKG
+    zkg install --force $PKG
 done
 
 # Load Zeek Plugins
-sudo echo "@load packages" >> /etc/zeek/site/local.zeek
+echo "@load packages" | sudo tee -a /etc/zeek/site/local.zeek >/dev/null
 
 ##########
 # Added Path Update to ~/.zshrc or ~/.bashrc
