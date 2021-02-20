@@ -24,7 +24,7 @@ This script automates the installation of third-party software and tools we do n
 # Tools
 ## Python Modules
 * [pymodbus](https://pymodbus.readthedocs.io/en/latest/)
-* [bacpypes](https://bacpypes.readthedocs.io/en/latest/_
+* [bacpypes](https://bacpypes.readthedocs.io/en/latest/)
 * [cpppo](https://github.com/pjkundert/cpppo)
 * [pycomm](https://github.com/ottowayi/pycomm3)
 * [opcua](https://github.com/FreeOpcUa/python-opcua)
@@ -39,10 +39,10 @@ This script automates the installation of third-party software and tools we do n
 * [CutSec Tools](https://github.com/cutaway-security/cutsec_tools.git)
 * [IEC61850 Library](https://github.com/mz-automation/libiec61850.git)
 * [IEC61850 Tool Chain](https://github.com/smartgridadsc/IEC61850ToolChain.git)
-* [Python Profinet](https://github.com/devkid/profinet.git )
+* [Python Profinet](https://github.com/devkid/profinet.git)
 * [SCADA-Profinet Network Attack](https://github.com/Chowdery/SCADA-Profinet_Network-Attack.git)
 * [SCADA-Tools](https://github.com/atimorin/scada-tools.git)
-* [Nmap-SCADA](https://github.com/jpalanco/nmap-scada.git )
+* [Nmap-SCADA](https://github.com/jpalanco/nmap-scada.git)
 * [Digital Bond Redpoint](https://github.com/digitalbond/Redpoint.git)
 * [Industrial Exploitation Framework](https://github.com/dark-lbp/isf.git)
   * This tool requires Python 2. Pipenv shell script is generated to run the tool.
