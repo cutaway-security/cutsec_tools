@@ -209,6 +209,7 @@ ICS_PROTOCOLS='
     mms 
     enip 
     siemens
+    tds
 '
 # Store packages in Associative Array
 declare -A ZARRAY=()
@@ -225,8 +226,11 @@ done
 # Loop through array and install packages
 for PKG in ${!ZARRAY[@]}; do
     echo $INSTALL_COMMENT'Installing Zeek Package: '$PKG
-    zkg install $PKG
+    zkg install --force --skiptests $PKG
 done
+
+# Load Zeek Plugins
+sudo echo "@load packages" >> /etc/zeek/site/local.zeek
 
 ##########
 # Added Path Update to ~/.zshrc or ~/.bashrc
@@ -241,11 +245,11 @@ for e in $SHFILE; do
     # Tag to help know if the shell resource files have been modified for PATH
     PTAG='CUTSEC_ICSTOOLS'
     # Updated PATH
-    PNEW='export PATH='$HOME'/.local/bin:'$HOME'/.cargo/bin:$PATH'
+    PNEW='export PATH='$HOME'/.zkg:'$HOME'/.local/bin:'$HOME'/.cargo/bin:$PATH'
     # Check for each shell file and update
     if [ -f $SHELL ]; then
         # Don't add if it is already there
-        if grep -q ICSTOOLS $SHELL; then
+        if ! grep -q $PTAG $SHELL; then
             # Make a backup of the current shellrc file
             cp $SHELL $SHELL"_"$(date +"%Y%m%d%H%M").bk
             echo ' ' >> $SHELL
@@ -265,7 +269,7 @@ if [ ! -f '.screenrc' ]; then
     wget https://gist.githubusercontent.com/cutaway/0ddfd31d993bf2f71378/raw/ecf390952c1196e650a4dd71ac484752e43ef5b2/.screenrc
 fi
 ## .vimrc sets up tabbed editing
-if [ ! -f '.screenrc' ]; then
+if [ ! -f '.vimrc' ]; then
     wget https://gist.githubusercontent.com/cutaway/d69c1dcc868eb1896998/raw/3126fdf17cd911b1ead61b295d76dfb541ada26d/.vimrc
 fi
 
