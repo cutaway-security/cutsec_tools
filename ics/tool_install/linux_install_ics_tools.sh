@@ -69,7 +69,7 @@ PIP_ICS_TOOLS='
     pymodbus
     bacpypes
     cpppo
-    pycomm
+    pycomm3
     opcua
     opcua-client
     python-snap7
