@@ -134,7 +134,7 @@ for REPO in $ICS_GIT_TOOLS; do
     cd $TOOLDIR
     # Get last field in URL to check for directory
     LURL=${REPO##*/}
-    RDIR=`cut -d'.' -f1 $LURL`
+    RDIR=`echo $LURL | cut -d'.' -f1`
     if [ -d $RDIR ]; then
         echo $INSTALL_COMMENT$RDIR" repo already exists! Pulling..."
         cd $RDIR
