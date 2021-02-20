@@ -17,6 +17,7 @@ echo 'WARNING: No warranty or guarantee these tools are secure or do not contain
 echo 'WARNING: Check all installed software on your own before use.'
 echo 'WARNING: USE AT YOUR OWN RISK.'
 echo
+INSTALL_COMMENT="CUTSEC Installer: "
 read -n1 -s -r -p $'Press Y to continue...\n' key
 
 if [ "$key" = 'Y' ]; then
@@ -29,12 +30,12 @@ fi
 ##########
 # Change to User's Home directory and create Tools Dir
 ##########
-echo 'Generating ICS Tools Directory at ~/Tools/ics-tools'
+echo $INSTALL_COMMENT'Generating ICS Tools Directory at ~/Tools/ics-tools'
 cd $HOME
 TOOLDIR=$HOME'/Tools/ics-tools'
 if [[ -d $TOOLDIR ]]
 then
-    echo $TOOLDIR" directory already exists! Skipping..."
+    echo $INSTALL_COMMENT$TOOLDIR" directory already exists! Skipping..."
 else
     mkdir -p $TOOLDIR
 fi
@@ -43,13 +44,13 @@ cd $TOOLDIR
 ##########
 # Update System
 ##########
-echo 'Updating System Packages'
+echo $INSTALL_COMMENT'Updating System Packages'
 sudo apt update && sudo apt -y dist-upgrade
 
 ##########
 # Be sure Python3 Pip and other packages are installed
 ##########
-echo 'Apt Install Required Programs'
+echo $INSTALL_COMMENT'Apt Install Required Programs'
 PYTHON_MODULES='
     python3-pip
     python2
@@ -66,7 +67,7 @@ sudo apt -y install $PYTHON_MODULES
 # Install Python Modules
 ##########
 ## Requirements
-echo 'Pip install Tool Required Python Modules'
+echo $INSTALL_COMMENT'Pip install Tool Required Python Modules'
 PIP_MODULES='
     ipython
     requests
@@ -86,7 +87,7 @@ PIP_MODULES='
 pip3 install $PIP_MODULES
 
 ## ICS Tools
-echo 'Pip install ICS Tools'
+echo $INSTALL_COMMENT'Pip install ICS Tools'
 PIP_ICS_TOOLS='
     pymodbus
     bacpypes
@@ -102,7 +103,7 @@ pip3 install $PIP_ICS_TOOLS
 ##########
 # Install Rust Modules
 ##########
-echo 'Rust Cargo install ICS Tools'
+echo $INSTALL_COMMENT'Rust Cargo install ICS Tools'
 RUST_ICS_TOOLS='
     rodbus-client
 '
@@ -111,7 +112,7 @@ cargo install $RUST_ICS_TOOLS
 ##########
 # Git clone ICS Tools
 ##########
-echo 'Downloading or updating GitHub Repos'
+echo $INSTALL_COMMENT'Downloading or updating GitHub Repos'
 ICS_GIT_TOOLS='
     https://github.com/danielmiessler/SecLists.git
     https://github.com/cutaway-security/chaps.git
@@ -128,26 +129,27 @@ ICS_GIT_TOOLS='
 '
 
 # Loop through each repo and check if we have downloaded it.
-for i in $ICS_GIT_TOOLS; do 
+for REPO in $ICS_GIT_TOOLS; do 
     # Reset into Tools directory
     cd $TOOLDIR
     # Get last field in URL to check for directory
-    LURL=${VAR##*/}
+    LURL=${REPO##*/}
     RDIR=`cut -d'.' -f1 $LURL`
     if [ -d $RDIR ]; then
-        echo $RDIR" repo already exists! Pulling..."
+        echo $INSTALL_COMMENT$RDIR" repo already exists! Pulling..."
         cd $RDIR
         git pull
         cd $TOOLDIR
     else
-        git clone $i; 
+        echo $INSTALL_COMMENT$RDIR" cloning..."
+        git clone $REPO; 
     fi
 done 
 
 ##########
 # Build Tools that need to be Compiled
 ##########
-echo 'Compiling IEC61850 Tools'
+echo $INSTALL_COMMENT'Compiling IEC61850 Tools'
 cd  $TOOLDIR/libiec61850/examples
 make clean
 make
@@ -158,7 +160,7 @@ make
 ##########
 # ISF requires Python 2.7. Must use PIPENV and generate a script to run correctly.
 ##########
-echo 'Setting up Industrial Exploit Framework'
+echo $INSTALL_COMMENT'Setting up Industrial Exploit Framework'
 cd $TOOLDIR/isf
 pipenv --two install -r requirements.txt
 echo 'pipenv run ./isf.py' > isf_RUNME_PIPENV.sh
@@ -167,7 +169,7 @@ chmod 755 isf_RUNME_PIPENV.sh
 ##########
 # Added Path Update to ~/.zshrc or ~/.bashrc
 ##########
-echo 'Configuring Shell Resource files'
+echo $INSTALL_COMMENT'Configuring Shell Resource files'
 SHFILE='
     bashrc
     zshrc
@@ -194,7 +196,7 @@ done
 ##########
 # Add Screen and VIM Resource files to configure correctly
 ##########
-echo 'Configuring Screen and VIM resources files'
+echo $INSTALL_COMMENT'Configuring Screen and VIM resources files'
 cd $HOME
 ## .screenrc sets up better visual and tabbed sessions
 if [ ! -f '.screenrc' ]; then
