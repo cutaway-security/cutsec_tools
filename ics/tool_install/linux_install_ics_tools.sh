@@ -69,7 +69,7 @@ sudo apt update && sudo apt -y dist-upgrade
 # Be sure Python3 Pip and other packages are installed
 ##########
 echo $INSTALL_COMMENT'Apt Install Required Programs'
-PYTHON_MODULES='
+APT_PACKAGES='
     python3-pip
     python2
     pipenv
@@ -77,9 +77,11 @@ PYTHON_MODULES='
     git
     rustc
     vim
+    zeek
+    zkg
 '
 
-sudo apt -y install $PYTHON_MODULES
+sudo apt -y install $APT_PACKAGES
 
 ##########
 # Install Python Modules
@@ -189,6 +191,42 @@ if [ -d $TOOLDIR/isf ]; then
         chmod 755 isf_RUNME_PIPENV.sh
     fi
 fi
+
+##########
+# Install Zeek and Zeek Packages
+##########
+echo $INSTALL_COMMENT'Install Zeek Packages for Industrial Protocols'
+ICS_PROTOCOLS='
+    icsnpp 
+    modbus 
+    profinet 
+    dnp 
+    opc 
+    hart 
+    cip 
+    bacnet 
+    goose 
+    mms 
+    enip 
+    siemens
+'
+# Store packages in Associative Array
+declare -A ZARRAY=()
+
+# Search each protocol for a Zeek Package
+for NAME in $ICS_PROTOCOLS; do 
+    ZPKG=`zkg search $NAME | grep -v 'no matches' | cut -d' ' -f1 | cut -d'/' -f3`
+    for NP in $ZPKG; do
+        # Use Associative Array to generate unique list of names 
+        ZARRAY[$NP]=1;
+    done
+done
+
+# Loop through array and install packages
+for PKG in ${!ZARRAY[@]}; do
+    echo $INSTALL_COMMENT'Installing Zeek Package: '$PKG
+    zkg install $PKG
+done
 
 ##########
 # Added Path Update to ~/.zshrc or ~/.bashrc
