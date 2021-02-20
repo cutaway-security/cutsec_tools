@@ -1,10 +1,28 @@
 #!/bin/bash
-## TODO: Add test for Ubuntu and Kali distros
+
+##########
+# Name: linux_install_ics_tools.sh
+# Purpose: Install and configure ICS Tools on a linux system.
+# Author: Don C. Weber (@cutaway) - Cutaway Security, LLC.
+# 
+# WARNING: Automated install of third-party software and tools we do not control.
+# WARNING: No warranty or guarantee these tools are secure or do not contain malicious code.
+# WARNING: Check all installed software on your own before use.
+# WARNING: USE AT YOUR OWN RISK.
+##########
+
+##########
+## TODO: Add test for Ubuntu and Kali distros (to handle differences)
+## TODO: Add test for distro versions and ask user to continue
 ## TODO: Add bypass variables
-## TODO: Pull APT packages from a configuration file
-## TODO: Pull PIP modules from a configuration file
-## TODO: Pull PIP ICS modules from a configuration file
-## TODO: Pull and update GitHub Repos from a configuration file
+## TODO: Add test to determine if IEC61850 tools were not updated and have already been compiled
+## TODO: Add test to determine if IEC61850 tools were updated and compile
+## TODO: Setup Configuration File
+### TODO: APT packages
+### TODO: PIP modules
+### TODO: PIP ICS modules
+### TODO: GitHub Repos
+##########
 
 ##########
 # Details
@@ -17,7 +35,7 @@ echo 'WARNING: No warranty or guarantee these tools are secure or do not contain
 echo 'WARNING: Check all installed software on your own before use.'
 echo 'WARNING: USE AT YOUR OWN RISK.'
 echo
-INSTALL_COMMENT="CUTSEC Installer: "
+INSTALL_COMMENT="### CUTSEC Installer: "
 read -n1 -s -r -p $'Press Y to continue...\n' key
 
 if [ "$key" = 'Y' ]; then
@@ -161,10 +179,16 @@ make
 # ISF requires Python 2.7. Must use PIPENV and generate a script to run correctly.
 ##########
 echo $INSTALL_COMMENT'Setting up Industrial Exploit Framework'
-cd $TOOLDIR/isf
-pipenv --two install -r requirements.txt
-echo 'pipenv run ./isf.py' > isf_RUNME_PIPENV.sh
-chmod 755 isf_RUNME_PIPENV.sh
+# Don't run if clone failed
+if [ -d $TOOLDIR/isf ]; then
+    cd $TOOLDIR/isf
+    # Don't run if Pipfile is present
+    if [ ! -f $TOOLDIR/isf/Pipfile ]; then
+        pipenv --two install -r requirements.txt
+        echo 'pipenv run ./isf.py' > isf_RUNME_PIPENV.sh
+        chmod 755 isf_RUNME_PIPENV.sh
+    fi
+fi
 
 ##########
 # Added Path Update to ~/.zshrc or ~/.bashrc
