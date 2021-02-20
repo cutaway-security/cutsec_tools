@@ -15,6 +15,9 @@ This script automates the installation of third-party software and tools we do n
 
 **USE AT YOUR OWN RISK.**
 
+## References
+* [ITI ICS-Security-Tools](https://github.com/ITI/ICS-Security-Tools) - many of these tools were noted in these lists.
+
 ## How to Run
 * Use wget to download [raw script](https://raw.githubusercontent.com/cutaway-security/cutsec_tools/master/ics/tool_install/linux_install_ics_tools.sh)
 * Change permissions of script: ```chmod 755 linux_install_ics_tools.sh```
