@@ -1,6 +1,14 @@
 #!/bin/bash
+## TODO: Add test for Ubuntu and Kali distros
+## TODO: Add bypass variables
+## TODO: Pull APT packages from a configuration file
+## TODO: Pull PIP modules from a configuration file
+## TODO: Pull PIP ICS modules from a configuration file
+## TODO: Pull and update GitHub Repos from a configuration file
 
+##########
 # Details
+##########
 echo 'Install Common ICS Tools on Linux Systems'
 echo '   linux_install_ics-tools.sh brought to you by Cutaway Security, LLC.'
 echo '   Author: Don C. Weber (@cutaway)'
@@ -18,17 +26,29 @@ else
     exit 0
 fi
 
+##########
 # Change to User's Home directory and create Tools Dir
+##########
 echo 'Generating ICS Tools Directory at ~/Tools/ics-tools'
-cd ~
+cd $HOME
 TOOLDIR=$HOME'/Tools/ics-tools'
-mkdir -p $TOOLDIR
+if [[ -d $TOOLDIR ]]
+then
+    echo $TOOLDIR" directory already exists! Skipping..."
+else
+    mkdir -p $TOOLDIR
+fi
+cd $TOOLDIR
 
-# Update 
+##########
+# Update System
+##########
 echo 'Updating System Packages'
 sudo apt update && sudo apt -y dist-upgrade
 
+##########
 # Be sure Python3 Pip and other packages are installed
+##########
 echo 'Apt Install Required Programs'
 PYTHON_MODULES='
     python3-pip
@@ -42,7 +62,9 @@ PYTHON_MODULES='
 
 sudo apt -y install $PYTHON_MODULES
 
+##########
 # Install Python Modules
+##########
 ## Requirements
 echo 'Pip install Tool Required Python Modules'
 PIP_MODULES='
@@ -77,15 +99,21 @@ PIP_ICS_TOOLS='
 
 pip3 install $PIP_ICS_TOOLS
 
+##########
 # Install Rust Modules
+##########
 echo 'Rust Cargo install ICS Tools'
 RUST_ICS_TOOLS='
     rodbus-client
 '
 cargo install $RUST_ICS_TOOLS
 
+##########
 # Git clone ICS Tools
+##########
+echo 'Downloading or updating GitHub Repos'
 ICS_GIT_TOOLS='
+    https://github.com/danielmiessler/SecLists.git
     https://github.com/cutaway-security/chaps.git
     https://github.com/cutaway-security/cutsec_tools.git
     https://github.com/mz-automation/libiec61850.git
@@ -96,35 +124,86 @@ ICS_GIT_TOOLS='
     https://github.com/jpalanco/nmap-scada.git 
     https://github.com/digitalbond/Redpoint.git
     https://github.com/dark-lbp/isf.git 
+    https://github.com/bitsadmin/wesng.git
 '
 
 cd $TOOLDIR
-for i in $ICS_GIT_TOOLS; do git clone $i; done 
+for i in $ICS_GIT_TOOLS; do 
+    # Get last field in URL to check for directory
+    LURL=${VAR##*/}
+    RDIR=`cut -d'.' -f1 $LURL`
+    if [ -d $TOOLDIR ]; then
+        echo $RDIR" repo already exists! Pulling..."
+        cd $RDIR
+        git pull
+        cd $TOOLDIR
+    else
+        git clone $i; 
+    fi
+done 
 
-# Build Compiled Tools
+##########
+# Build Tools that need to be Compiled
+##########
+echo 'Compiling IEC61850 Tools'
 cd  $TOOLDIR/libiec61850/examples
+make clean
 make
 cd  $TOOLDIR/IEC61850ToolChain
+make clean
 make
+
+##########
+# ISF requires Python 2.7. Must use PIPENV and generate a script to run correctly.
+##########
+echo 'Setting up Industrial Exploit Framework'
 cd $TOOLDIR/isf
 pipenv --two install -r requirements.txt
 echo 'pipenv run ./isf.py' > isf_RUNME_PIPENV.sh
 chmod 755 isf_RUNME_PIPENV.sh
 
+##########
 # Added Path Update to ~/.zshrc or ~/.bashrc
+##########
+echo 'Configuring Shell Resource files'
 SHFILE='
     bashrc
     zshrc
 '
 for e in $SHFILE; do
     SHELL=$HOME'/.'$e;
+    PTAG='CUTSEC_ICSTOOLS'
+    PNEW='export PATH=~/.local/bin:~/.cargo/bin:$PATH'
+    # Check for each shell file and update
     if [ -f $SHELL ]; then
-        echo '# Update Path for local software' >> $SHELL;
-        echo 'PATH=~/.local/bin:~/.cargo/bin:$PATH' >> $SHELL;
+        # Don't add if it is already there
+        if grep -q ICSTOOLS $SHELL; then
+            # Make a backup of the current shellrc file
+            cp $SHELL $SHELL"_"$(date +"%Y%m%d%H%M").bk
+            echo ' ' >> $SHELL
+            echo '# '$PTAG': Update Path for local software' >> $SHELL;
+            echo $PNEW >> $SHELL;
+        fi
     fi
 done
 
+##########
+# Add Screen and VIM Resource files to configure correctly
+##########
+echo 'Configuring Screen and VIM resources files'
+cd $HOME
+## .screenrc sets up better visual and tabbed sessions
+if [ ! -f '.screenrc' ]; then
+    wget https://gist.githubusercontent.com/cutaway/0ddfd31d993bf2f71378/raw/ecf390952c1196e650a4dd71ac484752e43ef5b2/.screenrc
+fi
+## .vimrc sets up tabbed editing
+if [ ! -f '.screenrc' ]; then
+    wget https://gist.githubusercontent.com/cutaway/d69c1dcc868eb1896998/raw/3126fdf17cd911b1ead61b295d76dfb541ada26d/.vimrc
+fi
+
+##########
 # Complete
+##########
 echo 'ICS Tools Installed. Happy Hunting....'
 echo '   Be sure to double check that the PATH env was updated correctly.'
 echo '   Some tools may not run due to Python 2.7 and Python 3 issues. Check each tools and update as necessary.'

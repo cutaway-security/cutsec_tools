@@ -38,6 +38,8 @@ This script automates the installation of third-party software and tools we do n
 * (rodbus-client)[https://github.com/stepfunc/rodbus]
 
 ## GitHub Repos
+* [SecLists](https://github.com/danielmiessler/SecLists.git)
+  * This might double up this repo on a Kali box since it might be installed or someone might install via APT 
 * [CHAPS](https://github.com/cutaway-security/chaps.git)
 * [CutSec Tools](https://github.com/cutaway-security/cutsec_tools.git)
 * [IEC61850 Library](https://github.com/mz-automation/libiec61850.git)
@@ -49,6 +51,7 @@ This script automates the installation of third-party software and tools we do n
 * [Digital Bond Redpoint](https://github.com/digitalbond/Redpoint.git)
 * [Industrial Exploitation Framework](https://github.com/dark-lbp/isf.git)
   * This tool requires Python 2. Pipenv shell script is generated to run the tool.
+* [Windows Exploit Suggester - Next Generation (WES-NG)](https://github.com/bitsadmin/wesng)  
 
 # Requirements
 ## Packages
