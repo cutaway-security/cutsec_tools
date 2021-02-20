@@ -3,7 +3,7 @@ This script will download and install ICS tools for testing different ICS device
 
 ## Actions:
 * Updates system packages - requires administrative privileges
-* Creates a ```Tools/ics-tools``` directory in the user's home directory to install tool repositories.
+* Creates a ```~/Tools/ics-tools``` directory in the user's home directory to install tool repositories.
 * Installs Package requirements
 * Installs Python requirements
 * Installs Python-based ICS Tools
@@ -23,13 +23,13 @@ This script automates the installation of third-party software and tools we do n
 
 # Tools
 ## Python Modules
-* (pymodbus)[https://pymodbus.readthedocs.io/en/latest/]
-* (bacpypes)[https://bacpypes.readthedocs.io/en/latest/]
-* (cpppo)[https://github.com/pjkundert/cpppo]
-* (pycomm)[https://github.com/ottowayi/pycomm3]
-* (opcua)[https://github.com/FreeOpcUa/python-opcua]
-* (opcua-client)[https://github.com/FreeOpcUa/opcua-client-gui]
-* (python-snap7)[https://pypi.org/project/python-snap7/]
+* [pymodbus](https://pymodbus.readthedocs.io/en/latest/)
+* [bacpypes](https://bacpypes.readthedocs.io/en/latest/_
+* [cpppo](https://github.com/pjkundert/cpppo)
+* [pycomm](https://github.com/ottowayi/pycomm3)
+* [opcua](https://github.com/FreeOpcUa/python-opcua)
+* [opcua-client](https://github.com/FreeOpcUa/opcua-client-gui)
+* [python-snap7](https://pypi.org/project/python-snap7/)
   
 ## Rust Cargo
 * (rodbus-client)[https://github.com/stepfunc/rodbus]
