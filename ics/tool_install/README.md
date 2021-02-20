@@ -13,7 +13,13 @@ This script will download and install ICS tools for testing different ICS device
 ## Warning / Considerations
 This script automates the installation of third-party software and tools we do not control. There is warranty or guarantee these tools are secure or do not contain malicious code. Check all installed software on your own before use.
 
-'''USE AT YOUR OWN RISK.'''
+**USE AT YOUR OWN RISK.**
+
+## How to Run
+* Use wget to download [raw script](https://raw.githubusercontent.com/cutaway-security/cutsec_tools/master/ics/tool_install/linux_install_ics_tools.sh)
+* Change permissions of script: ```chmod 755 linux_install_ics_tools.sh```
+* Run script: ```./linux_install_ics_tools.sh```
+  * NOTE: Do **NOT** run as administrator. The script will prompt for admin password when ```apt``` is run. All other commands will be run as the user.  
 
 # Tools
 ## Python Modules
@@ -39,7 +45,7 @@ This script automates the installation of third-party software and tools we do n
 * [Nmap-SCADA](https://github.com/jpalanco/nmap-scada.git )
 * [Digital Bond Redpoint](https://github.com/digitalbond/Redpoint.git)
 * [Industrial Exploitation Framework](https://github.com/dark-lbp/isf.git)
- * This tool requires Python 2. Pipenv shell script is generated to run the tool.
+  * This tool requires Python 2. Pipenv shell script is generated to run the tool.
 
 # Requirements
 ## Packages
@@ -50,7 +56,7 @@ This script automates the installation of third-party software and tools we do n
 * git
 * rustc
 * vim
-* 
+  
 ## Python
 * ipython
 * requests
