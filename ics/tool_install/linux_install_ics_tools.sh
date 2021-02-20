@@ -127,12 +127,14 @@ ICS_GIT_TOOLS='
     https://github.com/bitsadmin/wesng.git
 '
 
-cd $TOOLDIR
+# Loop through each repo and check if we have downloaded it.
 for i in $ICS_GIT_TOOLS; do 
+    # Reset into Tools directory
+    cd $TOOLDIR
     # Get last field in URL to check for directory
     LURL=${VAR##*/}
     RDIR=`cut -d'.' -f1 $LURL`
-    if [ -d $TOOLDIR ]; then
+    if [ -d $RDIR ]; then
         echo $RDIR" repo already exists! Pulling..."
         cd $RDIR
         git pull
@@ -172,8 +174,10 @@ SHFILE='
 '
 for e in $SHFILE; do
     SHELL=$HOME'/.'$e;
+    # Tag to help know if the shell resource files have been modified for PATH
     PTAG='CUTSEC_ICSTOOLS'
-    PNEW='export PATH=~/.local/bin:~/.cargo/bin:$PATH'
+    # Updated PATH
+    PNEW='export PATH='$HOME'/.local/bin:'$HOME'/.cargo/bin:$PATH'
     # Check for each shell file and update
     if [ -f $SHELL ]; then
         # Don't add if it is already there
