@@ -11,7 +11,7 @@ echo 'WARNING: USE AT YOUR OWN RISK.'
 echo
 read -n1 -s -r -p $'Press Y to continue...\n' key
 
-if [ "$key" = 'Y' ]; then
+if [ $(tr '[:lower:]' '[:upper:]' <<< "$key") = 'Y' ]; then
     echo 'Excellent.... Continuing... Enjoy....'
 else
     echo 'Exiting....'
