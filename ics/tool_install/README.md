@@ -11,7 +11,7 @@ This script will download and install ICS tools for testing different ICS device
 * Installs Git Repos and builds several tools 
 
 ## Warning / Considerations
-This script automates the installation of third-party software and tools we do not control. There is warranty or guarantee these tools are secure or do not contain malicious code. Check all installed software on your own before use.
+This script automates the installation of third-party software and tools we do not control. There is NO warranty or guarantee these tools are secure or do not contain malicious code. Check all installed software on your own before use.
 
 **USE AT YOUR OWN RISK.**
 
