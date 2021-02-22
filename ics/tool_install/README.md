@@ -27,12 +27,14 @@ This script automates the installation of third-party software and tools we do n
 # Tools
 ## Python Modules
 * [pymodbus](https://pymodbus.readthedocs.io/en/latest/)
+* [ctmodbus](https://github.com/ControlThings-io/ctmodbus)
 * [bacpypes](https://bacpypes.readthedocs.io/en/latest/)
 * [cpppo](https://github.com/pjkundert/cpppo)
 * [pycomm](https://github.com/ottowayi/pycomm3)
 * [opcua](https://github.com/FreeOpcUa/python-opcua)
 * [opcua-client](https://github.com/FreeOpcUa/opcua-client-gui)
 * [python-snap7](https://pypi.org/project/python-snap7/)
+* [ctserial](https://github.com/ControlThings-io/ctserial)
   
 ## Rust Cargo
 * (rodbus-client)[https://github.com/stepfunc/rodbus]

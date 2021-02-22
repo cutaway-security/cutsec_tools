@@ -111,12 +111,14 @@ pip3 install $PIP_MODULES
 echo $INSTALL_COMMENT'Pip install ICS Tools'
 PIP_ICS_TOOLS='
     pymodbus
+    ctmodbus
     bacpypes
     cpppo
     pycomm3
     opcua
     opcua-client
     python-snap7
+    ctserial
 '
 
 pip3 install $PIP_ICS_TOOLS
