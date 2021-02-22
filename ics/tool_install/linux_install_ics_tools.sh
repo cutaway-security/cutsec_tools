@@ -13,7 +13,7 @@
 
 ##########
 ## TODO: Add test for Ubuntu and Kali distros (to handle differences)
-## TODO: Add test for distro versions and ask user to continue
+## TODO: Add test for distro versions and ask user to continue -> DONE
 ## TODO: Add bypass variables
 ## TODO: Add test to determine if IEC61850 tools were not updated and have already been compiled
 ## TODO: Add test to determine if IEC61850 tools were updated and compile
@@ -25,36 +25,67 @@
 ## TODO: Fix Zeek Package install of Amazon packages
 ##########
 
+
+##########
+# Constants
+##########
+_ITEM="[-]"
+_IMPORTANT="[!]"
+_QUESTION="[?]"
+_INSTALL_COMMENT="### CUTSEC Installer: "
+_CONTINUE="Press Y to continue..."
+_OS=''
+
 ##########
 # Details
 ##########
 echo 'Install Common ICS Tools on Linux Systems'
 echo '   linux_install_ics-tools.sh brought to you by Cutaway Security, LLC.'
 echo '   Author: Don C. Weber (@cutaway)'
-echo 'WARNING: Automated install of third-party software and tools we do not control.'
-echo 'WARNING: No warranty or guarantee these tools are secure or do not contain malicious code.'
-echo 'WARNING: Check all installed software on your own before use.'
-echo 'WARNING: USE AT YOUR OWN RISK.'
+echo "$_IMPORTANT WARNING: Automated install of third-party software and tools we do not control."
+echo "$_IMPORTANT WARNING: No warranty or guarantee these tools are secure or do not contain malicious code."
+echo "$_IMPORTANT WARNING: Check all installed software on your own before use."
+echo "$_IMPORTANT WARNING: USE AT YOUR OWN RISK."
 echo
-INSTALL_COMMENT="### CUTSEC Installer: "
-read -n1 -s -r -p $'Press Y to continue...\n' key
 
-if [ $(tr '[:lower:]' '[:upper:]' <<< "$key") = 'Y' ]; then
-    echo 'Excellent.... Continuing... Enjoy....'
-else
-    echo 'Exiting....'
-    exit 0
-fi
+__userContinue() {
+        printf "$_CONTINUE \n"
+        read -e
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            printf "\nExiting....\n"
+            exit 0
+        fi
+
+}
+__userContinue
+printf "Excellent.... Continuing with installation.. Enjoy! \n"
+
+##########
+# Verify OS version is supported and tested
+##########
+_OS="$(lsb_release -is)"
+__osVerification() {
+    if [ "$_OS" != "Kali" -a "$_OS" != "Ubuntu" -a "$_OS" != "ManjaroLinux" ]; then
+        printf "$_ITEM This installer supports Kali, Ubuntu, and ManjaroLinux. \n"
+        printf "$_IMPORTANT Your operating system is unsupported/untested. \n"
+        exit 1
+    fi
+}
+printf "\n"
+printf "$_INSTALL_COMMENT Verifying Operating System... \n"
+__osVerification
+printf "$_ITEM Operating System detected: $_OS. \n"
+__userContinue
 
 ##########
 # Change to User's Home directory and create Tools Dir
 ##########
-echo $INSTALL_COMMENT'Generating ICS Tools Directory at ~/Tools/ics-tools'
+echo $_INSTALL_COMMENT'Generating ICS Tools Directory at ~/Tools/ics-tools'
 cd $HOME
 TOOLDIR=$HOME'/Tools/ics-tools'
 if [[ -d $TOOLDIR ]]
 then
-    echo $INSTALL_COMMENT$TOOLDIR" directory already exists! Skipping..."
+    echo $_INSTALL_COMMENT$TOOLDIR" directory already exists! Skipping..."
 else
     mkdir -p $TOOLDIR
 fi
@@ -63,13 +94,13 @@ cd $TOOLDIR
 ##########
 # Update System
 ##########
-echo $INSTALL_COMMENT'Updating System Packages'
+echo $_INSTALL_COMMENT'Updating System Packages'
 sudo apt update && sudo apt -y dist-upgrade
 
 ##########
 # Be sure Python3 Pip and other packages are installed
 ##########
-echo $INSTALL_COMMENT'Apt Install Required Programs'
+echo $_INSTALL_COMMENT'Apt Install Required Programs'
 APT_PACKAGES='
     python3-pip
     python2
@@ -88,7 +119,7 @@ sudo apt -y install $APT_PACKAGES
 # Install Python Modules
 ##########
 ## Requirements
-echo $INSTALL_COMMENT'Pip install Tool Required Python Modules'
+echo $_INSTALL_COMMENT'Pip install Tool Required Python Modules'
 PIP_MODULES='
     ipython
     requests
@@ -108,7 +139,7 @@ PIP_MODULES='
 pip3 install $PIP_MODULES
 
 ## ICS Tools
-echo $INSTALL_COMMENT'Pip install ICS Tools'
+echo $_INSTALL_COMMENT'Pip install ICS Tools'
 PIP_ICS_TOOLS='
     pymodbus
     bacpypes
@@ -124,7 +155,7 @@ pip3 install $PIP_ICS_TOOLS
 ##########
 # Install Rust Modules
 ##########
-echo $INSTALL_COMMENT'Rust Cargo install ICS Tools'
+echo $_INSTALL_COMMENT'Rust Cargo install ICS Tools'
 RUST_ICS_TOOLS='
     rodbus-client
 '
@@ -133,7 +164,7 @@ cargo install $RUST_ICS_TOOLS
 ##########
 # Git clone ICS Tools
 ##########
-echo $INSTALL_COMMENT'Downloading or updating GitHub Repos'
+echo $_INSTALL_COMMENT'Downloading or updating GitHub Repos'
 ICS_GIT_TOOLS='
     https://github.com/danielmiessler/SecLists.git
     https://github.com/cutaway-security/chaps.git
@@ -157,12 +188,12 @@ for REPO in $ICS_GIT_TOOLS; do
     LURL=${REPO##*/}
     RDIR=`echo $LURL | cut -d'.' -f1`
     if [ -d $RDIR ]; then
-        echo $INSTALL_COMMENT$RDIR" repo already exists! Pulling..."
+        echo $_INSTALL_COMMENT$RDIR" repo already exists! Pulling..."
         cd $RDIR
         git pull
         cd $TOOLDIR
     else
-        echo $INSTALL_COMMENT$RDIR" cloning..."
+        echo $_INSTALL_COMMENT$RDIR" cloning..."
         git clone $REPO; 
     fi
 done 
@@ -170,7 +201,7 @@ done
 ##########
 # Build Tools that need to be Compiled
 ##########
-echo $INSTALL_COMMENT'Compiling IEC61850 Tools'
+echo $_INSTALL_COMMENT'Compiling IEC61850 Tools'
 cd  $TOOLDIR/libiec61850/examples
 make clean
 make
@@ -181,7 +212,7 @@ make
 ##########
 # ISF requires Python 2.7. Must use PIPENV and generate a script to run correctly.
 ##########
-echo $INSTALL_COMMENT'Setting up Industrial Exploit Framework'
+echo $_INSTALL_COMMENT'Setting up Industrial Exploit Framework'
 # Don't run if clone failed
 if [ -d $TOOLDIR/isf ]; then
     cd $TOOLDIR/isf
@@ -196,7 +227,7 @@ fi
 ##########
 # Install Zeek and Zeek Packages
 ##########
-echo $INSTALL_COMMENT'Install Zeek Packages for Industrial Protocols'
+echo $_INSTALL_COMMENT'Install Zeek Packages for Industrial Protocols'
 ICS_PROTOCOLS='
     icsnpp 
     modbus 
@@ -226,7 +257,7 @@ done
 
 # Loop through array and install packages
 for PKG in ${!ZARRAY[@]}; do
-    echo $INSTALL_COMMENT'Installing Zeek Package: '$PKG
+    echo $_INSTALL_COMMENT'Installing Zeek Package: '$PKG
     zkg install --force $PKG
 done
 
@@ -236,7 +267,7 @@ echo "@load packages" | sudo tee -a /etc/zeek/site/local.zeek >/dev/null
 ##########
 # Added Path Update to ~/.zshrc or ~/.bashrc
 ##########
-echo $INSTALL_COMMENT'Configuring Shell Resource files'
+echo $_INSTALL_COMMENT'Configuring Shell Resource files'
 SHFILE='
     bashrc
     zshrc
@@ -263,7 +294,7 @@ done
 ##########
 # Add Screen and VIM Resource files to configure correctly
 ##########
-echo $INSTALL_COMMENT'Configuring Screen and VIM resources files'
+echo $_INSTALL_COMMENT'Configuring Screen and VIM resources files'
 cd $HOME
 ## .screenrc sets up better visual and tabbed sessions
 if [ ! -f '.screenrc' ]; then
