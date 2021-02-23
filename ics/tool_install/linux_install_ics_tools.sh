@@ -216,6 +216,7 @@ ICS_PROTOCOLS='
 '
 # Store packages in Associative Array
 declare -A ZARRAY=()
+zkg refresh
 
 # Search each protocol for a Zeek Package
 for NAME in $ICS_PROTOCOLS; do 
