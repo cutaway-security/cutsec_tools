@@ -78,8 +78,6 @@ APT_PACKAGES='
     git
     rustc
     vim
-    zeek
-    zkg
 '
 
 sudo apt -y install $APT_PACKAGES
@@ -196,47 +194,6 @@ if [ -d $TOOLDIR/isf ]; then
 fi
 
 ##########
-# Install Zeek and Zeek Packages
-##########
-echo $INSTALL_COMMENT'Install Zeek Packages for Industrial Protocols'
-ICS_PROTOCOLS='
-    icsnpp 
-    modbus 
-    profinet 
-    dnp 
-    opc 
-    hart 
-    cip 
-    bacnet 
-    goose 
-    mms 
-    enip 
-    siemens
-    tds
-'
-# Store packages in Associative Array
-declare -A ZARRAY=()
-zkg refresh
-
-# Search each protocol for a Zeek Package
-for NAME in $ICS_PROTOCOLS; do 
-    ZPKG=`zkg search $NAME | grep -v -e 'no matches' -e test | cut -d' ' -f1 | cut -d'/' -f3`
-    for NP in $ZPKG; do
-        # Use Associative Array to generate unique list of names 
-        ZARRAY[$NP]=1;
-    done
-done
-
-# Loop through array and install packages
-for PKG in ${!ZARRAY[@]}; do
-    echo $INSTALL_COMMENT'Installing Zeek Package: '$PKG
-    zkg install --force $PKG
-done
-
-# Load Zeek Plugins
-echo "@load packages" | sudo tee -a /etc/zeek/site/local.zeek >/dev/null
-
-##########
 # Added Path Update to ~/.zshrc or ~/.bashrc
 ##########
 echo $INSTALL_COMMENT'Configuring Shell Resource files'
@@ -249,7 +206,7 @@ for e in $SHFILE; do
     # Tag to help know if the shell resource files have been modified for PATH
     PTAG='CUTSEC_ICSTOOLS'
     # Updated PATH
-    PNEW='export PATH='$HOME'/.zkg:'$HOME'/.local/bin:'$HOME'/.cargo/bin:$PATH'
+    PNEW='export PATH='$HOME'/.local/bin:'$HOME'/.cargo/bin:$PATH'
     # Check for each shell file and update
     if [ -f $SHELL ]; then
         # Don't add if it is already there
