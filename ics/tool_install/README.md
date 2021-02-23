@@ -26,34 +26,34 @@ This script automates the installation of third-party software and tools we do n
 
 # Tools
 ## Python Modules
-* [pymodbus](https://pymodbus.readthedocs.io/en/latest/)
-* [ctmodbus](https://github.com/ControlThings-io/ctmodbus)
-* [bacpypes](https://bacpypes.readthedocs.io/en/latest/)
-* [cpppo](https://github.com/pjkundert/cpppo)
-* [pycomm3](https://github.com/ottowayi/pycomm3)
-* [opcua](https://github.com/FreeOpcUa/python-opcua)
-* [opcua-client](https://github.com/FreeOpcUa/opcua-client-gui)
-* [python-snap7](https://pypi.org/project/python-snap7/)
-* [ctserial](https://github.com/ControlThings-io/ctserial)
+* [pymodbus](https://pymodbus.readthedocs.io/en/latest/) - Modbus
+* [ctmodbus](https://github.com/ControlThings-io/ctmodbus) - Modbus
+* [bacpypes](https://bacpypes.readthedocs.io/en/latest/) - BACnet
+* [cpppo](https://github.com/pjkundert/cpppo) - EtherNet/IP CIP
+* [pycomm3](https://github.com/ottowayi/pycomm3) - EtherNet/IP CIP
+* [opcua](https://github.com/FreeOpcUa/python-opcua) - OPC UA
+* [opcua-client](https://github.com/FreeOpcUa/opcua-client-gui) - OPC UA
+* [python-snap7](https://pypi.org/project/python-snap7/) - Siemens 7
+* [ctserial](https://github.com/ControlThings-io/ctserial) - Serial
   
 ## Rust Cargo
-* [rodbus-client](https://github.com/stepfunc/rodbus)
+* [rodbus-client](https://github.com/stepfunc/rodbus) - Modbus
 
 ## GitHub Repos
-* [SecLists](https://github.com/danielmiessler/SecLists.git)
+* [SecLists](https://github.com/danielmiessler/SecLists.git) - General files and data
   * This might double up this repo on a Kali box since it might be installed or someone might install via APT 
-* [CHAPS](https://github.com/cutaway-security/chaps.git)
-* [CutSec Tools](https://github.com/cutaway-security/cutsec_tools.git)
-* [IEC61850 Library](https://github.com/mz-automation/libiec61850.git)
-* [IEC61850 Tool Chain](https://github.com/smartgridadsc/IEC61850ToolChain.git)
-* [Python Profinet](https://github.com/devkid/profinet.git)
-* [SCADA-Profinet Network Attack](https://github.com/Chowdery/SCADA-Profinet_Network-Attack.git)
-* [SCADA-Tools](https://github.com/atimorin/scada-tools.git)
-* [Nmap-SCADA](https://github.com/jpalanco/nmap-scada.git)
-* [Digital Bond Redpoint](https://github.com/digitalbond/Redpoint.git)
-* [Industrial Exploitation Framework](https://github.com/dark-lbp/isf.git)
+* [CHAPS](https://github.com/cutaway-security/chaps.git) - Windows Configuration
+* [CutSec Tools](https://github.com/cutaway-security/cutsec_tools.git) - General Scripts
+* [IEC61850 Library](https://github.com/mz-automation/libiec61850.git) - IEC 61850 for Manufacturing Message Specification and Goose
+* [IEC61850 Tool Chain](https://github.com/smartgridadsc/IEC61850ToolChain.git) - IEC 61850 for Manufacturing Message Specification and Goose
+* [Python Profinet](https://github.com/devkid/profinet.git) - Profinet
+* [SCADA-Profinet Network Attack](https://github.com/Chowdery/SCADA-Profinet_Network-Attack.git) - Profinet
+* [SCADA-Tools](https://github.com/atimorin/scada-tools.git) - NSE and other Scripts
+* [Nmap-SCADA](https://github.com/jpalanco/nmap-scada.git) - NSE Scripts
+* [Digital Bond Redpoint](https://github.com/digitalbond/Redpoint.git) - NSE Scripts
+* [Industrial Exploitation Framework](https://github.com/dark-lbp/isf.git) - Multiple ICS Protocols and tools
   * This tool requires Python 2. Pipenv shell script is generated to run the tool.
-* [Windows Exploit Suggester - Next Generation (WES-NG)](https://github.com/bitsadmin/wesng)  
+* [Windows Exploit Suggester - Next Generation (WES-NG)](https://github.com/bitsadmin/wesng) - Windows Configuration
 
 # Requirements
 ## Packages
