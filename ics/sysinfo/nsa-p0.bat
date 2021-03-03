@@ -27,7 +27,7 @@
 ::###############################
 
 ::### Create storage directory for files in users Temp directory at %temp% ###
-set "nsa_p0_dest=nsa-p0-%date:~10,4%%date:~4,2%%date:~7,2%%time::=-%"
+set "nsa_p0_dest=%computername%-nsa-p0-%date:~10,4%%date:~4,2%%date:~7,2%%time::=-%"
 if not exist %temp%\%nsa_p0_dest% mkdir %temp%\%nsa_p0_dest%
 echo "NSA Position 0 Files will be written to" %temp%\%nsa_p0_dest%
 ::###############################
