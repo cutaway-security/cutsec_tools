@@ -19,26 +19,26 @@ for i in $cmds; do
     echo ----------------------
     echo List $i
     echo ----------------------
-    $i -L
+    /usr/sbin/$i -L
     echo ----------------------
     echo
     echo ----------------------
     echo Flush $i
     echo ----------------------
-    $i -F
+    /usr/sbin/$i -F
     echo
     if [[ $mode == 'start' ]]; then
         echo ----------------------
         echo Blocking Traffic - $i
         echo ----------------------
-        $i -A OUTPUT -o $intface -j DROP
+        /usr/sbin/$i -A OUTPUT -o $intface -j DROP
         echo ----------------------
         echo
     fi
     echo ----------------------
     echo List Result $i
     echo ----------------------
-    $i -L
+    /usr/sbin/$i -L
     echo ----------------------
     echo
 done

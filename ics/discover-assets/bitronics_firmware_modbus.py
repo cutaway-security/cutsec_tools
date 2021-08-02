@@ -10,8 +10,8 @@ from pymodbus.constants import Defaults
 ###################
 DEBUG = 0
 BT_FW = {}
-RANGE = ['192.168.76.0/24','1192.168.77.0/24','192.168.78.0/24']
-#RANGE = ['192.168.76.0/24']
+RANGE = ['192.168.1.0/24','1192.168.2.0/24','192.168.3.0/24']
+#RANGE = ['192.168.1.0/24']
 PORT  = 502
 Defaults.Timeout = .25
 # Product ID Map

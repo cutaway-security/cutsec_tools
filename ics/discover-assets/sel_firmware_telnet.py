@@ -5,8 +5,8 @@ import netaddr
 
 # Globals
 DEBUG      = 0
-#addr      = '192.168.76.39'
-RANGE      = ['192.168.76.0/24','192.168.77.0/24','192.168.78.0/24']
+#addr      = '192.168.1.39'
+RANGE      = ['192.168.1.0/24','192.168.2.0/24','192.168.3.0/24']
 PORT       = 23
 #conn      = (addr,port)
 # NOTE: Default credentials
