@@ -1,3 +1,7 @@
+##### Table of Contents  
+[Headers](#headers) 
+[Headers](##headers) 
+
 # ICS Tool Installation Scripts
 ## Install ICS Tools - Linux
 This script will download and install ICS tools for testing different ICS devices and protocols. It is meant to be run on a new Kali or Linux distribution.
