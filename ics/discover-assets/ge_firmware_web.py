@@ -5,7 +5,7 @@ import sys
 import socket,struct
 
 DEBUG = 0
-#url = 'http://192.168.76.154'
+#url = 'http://192.168.1.154'
 url = 'http://'
 
 def conn_GE(ip):
