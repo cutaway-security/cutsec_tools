@@ -115,8 +115,10 @@ ICS_GIT_TOOLS=(
 'https://github.com/cisagov/icsnpp-bsap-ip.git'
 'https://github.com/cisagov/icsnpp-bsap-serial.git'
 'https://github.com/cisagov/icsnpp-dnp3.git'
+'https://github.com/cisagov/icsnpp-enip'
+'https://github.com/cisagov/icsnpp-ethercat'
 'https://github.com/cisagov/icsnpp-modbus.git'
-'https://github.com/cisagov/icsnpp-enip.git'
+'https://github.com/cisagov/icsnpp-opcua-binary'
 'https://github.com/amzn/zeek-plugin-profinet.git'
 'https://github.com/amzn/zeek-plugin-enip.git'
 'https://github.com/amzn/zeek-plugin-s7comm.git'
@@ -165,7 +167,9 @@ LOADZEEK='
 @load /home/kali/Tools/ics-zeek/icsnpp-bsap-serial/scripts/\n
 @load /home/kali/Tools/ics-zeek/icsnpp-dnp3/scripts/\n
 @load /home/kali/Tools/ics-zeek/icsnpp-enip/scripts/\n
+@load /home/kali/Tools/ics-zeek/icsnpp-ethercat/scripts/\n
 @load /home/kali/Tools/ics-zeek/icsnpp-modbus/scripts/\n
+@load /home/kali/Tools/ics-zeek/iicsnpp-opcua-binary/scripts/\n
 '
 cd $TOOLDIR
 echo $LOADZEEK >load.zeek
