@@ -1,8 +1,8 @@
-##### Table of Contents  
-[Headers](#headers) 
-[Headers](##headers) 
+__Table of Contents__
+[ICS Tool Installation Script](https://github.com/cutaway-security/cutsec_tools/tree/master/ics/tool_install#install-ics-tools---linux)
+[Zeek Package Install Script](https://github.com/cutaway-security/cutsec_tools/tree/master/ics/tool_install#zeek-package-install-script) 
 
-# ICS Tool Installation Scripts
+# ICS Tool Installation Script
 ## Install ICS Tools - Linux
 This script will download and install ICS tools for testing different ICS devices and protocols. It is meant to be run on a new Kali or Linux distribution.
 
