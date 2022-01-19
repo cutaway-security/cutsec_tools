@@ -1,6 +1,6 @@
 __Table of Contents__
-[ICS Tool Installation Script](https://github.com/cutaway-security/cutsec_tools/tree/master/ics/tool_install#install-ics-tools---linux)
-[Zeek Package Install Script](https://github.com/cutaway-security/cutsec_tools/tree/master/ics/tool_install#zeek-package-install-script) 
+* [ICS Tool Installation Script](https://github.com/cutaway-security/cutsec_tools/tree/master/ics/tool_install#install-ics-tools---linux)
+* [Zeek Package Install Script](https://github.com/cutaway-security/cutsec_tools/tree/master/ics/tool_install#zeek-package-install-script) 
 
 # ICS Tool Installation Script
 ## Install ICS Tools - Linux
