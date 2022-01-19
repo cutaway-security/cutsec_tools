@@ -1,7 +1,8 @@
-# Install ICS Tools - Linux
+# ICS Tool Installation Scripts
+## Install ICS Tools - Linux
 This script will download and install ICS tools for testing different ICS devices and protocols. It is meant to be run on a new Kali or Linux distribution.
 
-## Actions:
+### Actions:
 * Updates system packages - requires administrative privileges
 * Creates a ```~/Tools/ics-tools``` directory in the user's home directory to install tool repositories.
 * Installs Package requirements
@@ -10,12 +11,12 @@ This script will download and install ICS tools for testing different ICS device
 * Installs Rust-based ICS Tools
 * Installs Git Repos and builds several tools 
 
-## Warning / Considerations
+### Warning / Considerations
 This script automates the installation of third-party software and tools we do not control. There is NO warranty or guarantee these tools are secure or do not contain malicious code. Check all installed software on your own before use.
 
 **USE AT YOUR OWN RISK.**
 
-## References
+### References
 * [ITI ICS-Security-Tools](https://github.com/ITI/ICS-Security-Tools) - many of these tools were noted in these lists.
 
 ## How to Run
@@ -24,8 +25,8 @@ This script automates the installation of third-party software and tools we do n
 * Run script: ```./linux_install_ics_tools.sh```
   * NOTE: Do **NOT** run as administrator. The script will prompt for admin password when ```apt``` is run. All other commands will be run as the user.  
 
-# Tools
-## Python Modules
+### Tools
+#### Python Modules
 * [pymodbus](https://pymodbus.readthedocs.io/en/latest/) - Modbus
 * [ctmodbus](https://github.com/ControlThings-io/ctmodbus) - Modbus
 * [bacpypes](https://bacpypes.readthedocs.io/en/latest/) - BACnet
@@ -36,10 +37,10 @@ This script automates the installation of third-party software and tools we do n
 * [python-snap7](https://pypi.org/project/python-snap7/) - Siemens 7
 * [ctserial](https://github.com/ControlThings-io/ctserial) - Serial
   
-## Rust Cargo
+#### Rust Cargo
 * [rodbus-client](https://github.com/stepfunc/rodbus) - Modbus
 
-## GitHub Repos
+#### GitHub Repos
 * [SecLists](https://github.com/danielmiessler/SecLists.git) - General files and data
   * This might double up this repo on a Kali box since it might be installed or someone might install via APT 
 * [CHAPS](https://github.com/cutaway-security/chaps.git) - Windows Configuration
@@ -55,8 +56,8 @@ This script automates the installation of third-party software and tools we do n
   * This tool requires Python 2. Pipenv shell script is generated to run the tool.
 * [Windows Exploit Suggester - Next Generation (WES-NG)](https://github.com/bitsadmin/wesng) - Windows Configuration
 
-# Requirements
-## Packages
+### Requirements
+#### Packages
 * python3-pip
 * python2
 * pipenv
@@ -65,7 +66,7 @@ This script automates the installation of third-party software and tools we do n
 * rustc
 * vim
   
-## Python
+#### Python
 * ipython
 * requests
 * paramiko
@@ -80,6 +81,20 @@ This script automates the installation of third-party software and tools we do n
 * lxml
 * testresources
 
-# Tested On
+### Tested On
 * Ubuntu 20.04.2.0 LTS
 * Kali 2020.4
+
+## Zeek Package Install Script
+### Installation
+Run script: 
+
+```zsh
+chmod linux_install_ics_zeek.zsh
+./linux_install_ics_zeek.zsh
+```
+### Parsing with Zeek
+Analyze PCAP files using: 
+```zsh
+zeek -Cr <pcap> $HOME/Tools/ics-zeek/load.zeek
+```
