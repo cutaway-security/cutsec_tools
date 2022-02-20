@@ -94,7 +94,7 @@ This script automates the installation of third-party software and tools we do n
 Run script: 
 
 ```zsh
-chmod linux_install_ics_zeek.zsh
+chmod 755 linux_install_ics_zeek.zsh
 ./linux_install_ics_zeek.zsh
 ```
 ### Parsing with Zeek
