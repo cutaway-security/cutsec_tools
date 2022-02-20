@@ -89,7 +89,9 @@ This script automates the installation of third-party software and tools we do n
 * Ubuntu 20.04.2.0 LTS
 * Kali 2020.4
 
-## Zeek Package Install Script
+## Zeek ICS Plugins & Packages Install Script
+This script will download and install Zeek ICS plugins and packages. IT DOES NOT INSTALL ZEEK. Zeek must be installed and configured before running this script.  
+
 ### Installation
 Run script: 
 
