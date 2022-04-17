@@ -1,6 +1,6 @@
 <#
 	set_win_fw_secure_auth.ps1 - This script will configure Windows Firewall
-        to protect the communications for a Modbus server and client using
+        to protect the communications for a Industrial Protocol server and client using
         built in IPSec capabilities of the Windows OS. Secure authentication
         defaults to Machine Kerberos but can be configured for Pre-shared
         Key on systems not connected to a Windows Domain (not recommended).
@@ -32,13 +32,16 @@
 	Point Of Contact:    Don C. Weber <dev [@] cutawaysecurity.com>
 #>
 
+#########################################
+# Command Line Arguments and Parameters
+#########################################
 param (
     [switch] $help,
     [switch] $check,
     [switch] $disable_warning,
-    [string] $mb_server    = '',
-    [string] $mb_client    = '',
-    [string] $mb_port      = '10502',
+    [string] $proto_server = '',
+    [string] $proto_client = '',
+    [string] $proto_port   = '10502',
     [string] $dname_header = 'SANS ICS Concepts: ',
     [string] $auth_method  = 'Kerberos',
     [string] $psk          = 'controlthings.io'
@@ -49,11 +52,11 @@ param (
 #########################################
 Function Get-Usage{
     Write-Output "`nServer Firewall Configuration"
-    Write-Output "  NOTE: Not providing these options will configure authentication for the Modbus Client"
-    Write-Output "    -mb_server <server IP address> : Modbus Server IP Address"
-    Write-Output "    -mb_client <server IP address> : Modbus Server IP Address"
+    Write-Output "  NOTE: Not providing these options will configure authentication for the Industrial Protocol Client"
+    Write-Output "    -proto_server <server IP address> : Industrial Protocol Server IP Address"
+    Write-Output "    -proto_client <server IP address> : Industrial Protocol Server IP Address"
     Write-Output "`nOther Configuration Options"
-    Write-Output "    -mb_port <server IP address> : Modbus Server Port [Default: 10502]"
+    Write-Output "    -mb_port <server IP address> : Industrial Protocol Server Port [Default: 10502]"
     Write-Output "    -auth_method (Kerberos | PSK) : Authentication Type [Default: Kerberos]"
     Write-Output "    -dname_header 'Descriptive Name: ' : Descriptive name to tag firewall rules [Default: 'SANS ICS Concepts: ']"
     Write-Output "    -psk 'correcthorsestaplebattery' : Pre-Shared Key [Default: controlthings.io]"
@@ -79,7 +82,7 @@ if ($auth_method -eq 'Kerberos'){
     Write-Output "[!] Authentication method not supported.`n"
     Get-Usage
 }
-$fw_dname    = "$dname_header Allow Modbus Inbound Port $mb_port"
+$fw_dname    = "$dname_header Allow Industrial Protocol Inbound Port $proto_port"
 $rule_search = "$dname_header*"
 $start_time_readable = Get-Date -Format "dddd MM/dd/yyyy HH:mm"
 $script_name         = 'set_win_fw_secure_auth'
@@ -108,16 +111,16 @@ Function Get-UserConfirmation {
     } else {
         Write-Output "*** Use At Your Own Risk!!!! Do not run on production systems without testing. ***`n"
 
-        Write-Output "[*] Modbus Server: $mb_server"
-        Write-Output "[*] Modbus Client: $mb_client"
-        Write-Output "[*] Modbus Port:   $mb_port"
+        Write-Output "[*] Industrial Protocol Server: $proto_server"
+        Write-Output "[*] Industrial Protocol Client: $proto_client"
+        Write-Output "[*] Industrial Protocol Port:   $proto_port"
         Write-Output "[*] Display Header: $dname_header"
         Write-Output "[*] Authentication Method: $auth_method"
         if ($auth_method -eq "PSK") { Write-Output "[*] Pre-Shared Key: $psk" }
         Write-Output "`n"
 
         # Confirm client or server configuration.
-        if ($mb_server -and $mb_client){
+        if ($proto_server -and $proto_client){
             $confirmation = Read-Host "Proceed with configuring server? [N/y]"
         }else{
             $confirmation = Read-Host "Proceed with configuring client? [N/y]"
@@ -161,8 +164,8 @@ Get-UserConfirmation
 # Computer Auth via Machine via Kerberos - PREFERRED METHOD But Requires Domain
 if ($auth_method -eq 'Kerberos'){
     Write-Host "[*] Configuring for Kerberos authentication"
-    $mkerbauthprop   = New-NetIPsecAuthProposal -Machine -Kerberos
-    $p1Auth          = New-NetIPsecPhase1AuthSet -DisplayName $authp_dname -Proposal $mkerbauthprop
+    $mkerbauthprop = New-NetIPsecAuthProposal -Machine -Kerberos
+    $p1Auth        = New-NetIPsecPhase1AuthSet -DisplayName $authp_dname -Proposal $mkerbauthprop
 }else{
     # Pre-shared Key Auth - NOT PREFFERED For DEMONSTRATION ONLY
     Write-Host "[*] Configuring for Pre-Shared Key authentication"
@@ -174,10 +177,10 @@ if ($auth_method -eq 'Kerberos'){
 Write-Output "[*] Setting NetIPSecRule"
 New-NetIPSecRule -DisplayName $ipsec_dname -InboundSecurity Require -OutboundSecurity Require -Phase1AuthSet $p1Auth.Name
 
-if ($mb_server -and $mb_client){
+if ($proto_server -and $proto_client){
     # Firewall Rule
     Write-Output "[*] Server system, setting NetFirewallRule."
-    New-NetFirewallRule -DisplayName $fw_dname -Direction Inbound -Protocol TCP -LocalPort $mb_port -LocalAddress $modbus_server -RemoteAddress $modbus_client -Authentication Required -Action Allow
+    New-NetFirewallRule -DisplayName $fw_dname -Direction Inbound -Protocol TCP -LocalPort $proto_port -LocalAddress $proto_server -RemoteAddress $proto_client -Authentication Required -Action Allow
 } else {
     Write-Output "[*] Client system, not setting NetFirewallRule."
 }
