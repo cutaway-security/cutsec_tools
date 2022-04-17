@@ -6,7 +6,7 @@
         Key on systems not connected to a Windows Domain (not recommended).
 
     WARNING: This script will modify your system. Test before implementing.
-        This script is are distributed in the hope that they will be useful, 
+        This script is distributed in the hope that it will be useful, 
         but WITHOUT ANY WARRANTY; without even the implied warranty of 
         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
