@@ -187,3 +187,14 @@ Write-Output "[*] Script completed successfully. Use the following commands to r
 Write-Output "[*] Remove-NetFirewallRule -DisplayName `"$rule_search`""
 Write-Output "[*] Remove-NetIPSecRule -DisplayName `"$rule_search`""
 Write-Output "[*] Remove-NetIPsecPhase1AuthSet -DisplayName `"$rule_search`""
+
+<#
+# Resources and documentation
+Windows Defender Firewall with Advanced Security Administration with Windows PowerShell: https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/windows-firewall-with-advanced-security-administration-with-windows-powershell
+New-NetFirewallRule: https://docs.microsoft.com/en-us/powershell/module/netsecurity/new-netfirewallrule?view=windowsserver2022-ps
+New-NetIPsecRule: https://docs.microsoft.com/en-us/powershell/module/netsecurity/new-netipsecrule?view=windowsserver2022-ps
+New-NetIPsecAuthProposal: https://docs.microsoft.com/en-us/powershell/module/netsecurity/new-netipsecauthproposal?view=windowsserver2022-ps
+New-NetIPsecPhase1AuthSet: https://docs.microsoft.com/en-us/powershell/module/netsecurity/new-netipsecphase1authset?view=windowsserver2022-ps
+New-NetIPsecPhase2AuthSet: https://docs.microsoft.com/en-us/powershell/module/netsecurity/new-netipsecphase2authset?view=windowsserver2022-ps
+Windows Defender Firewall with Advanced Security Administration with Windows PowerShell: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/public/windows/security/threat-protection/windows-firewall/windows-firewall-with-advanced-security-administration-with-windows-powershell.md
+#>
