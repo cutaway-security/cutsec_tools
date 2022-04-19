@@ -29,7 +29,26 @@
 # 
 # Syntax:
 #         CPEtoCVE.ps1 [-h] [-o] [-d <seconds] [-a <apikey>] -i <filename>
+#
 ##########################################################################
+<#
+Process to obtain CPE's for software:
+ 
+    Identify the CPE for the software by searching the NVD NIST Website
+        https://nvd.nist.gov/products/cpe/search
+    Obtain the CPEv2.3 string for the software.
+        Search for ‘Apache AVRO’ identifies multiple CPEv2.3 strings.
+        Pick one and modify it to the correct version or where the version field is a wild card. 
+            For AVRO version 1.10.1 the string ‘cpe:2.3:a:apache:avro:1.10.1:*:*:*:*:*:*:*’ becomes
+                cpe:2.3:a:apache:avro:1.9.1:*:*:*:*:*:*:* or
+                cpe:2.3:a:apache:avro:*:*:*:*:*:*:*:*
+            NOTE: Searching for this in the NVD search field will show if it is a valid string
+            NOTE: Sometimes this doesn’t work, but Googling “apache avro CPE” will return a useable string to search in NVD NIST
+    Save all the CPE entries into a text file, one per line, and save.
+    Run the script CPEtoCVE.ps1 (works in OSX pwsh and should work in Linux and Windows)
+    CPEtoCVE.ps1 -i <cpe_file.txt> -o
+    This will write the output to the file cpe_file_<timestamp>.txt
+#>
 
 param (
     [alias("a")] $apikey,
