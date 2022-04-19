@@ -28,47 +28,80 @@
 #         that users "sleep" their scripts for six seconds between requests.
 # 
 # Syntax:
-#         CPEtoCVE.ps1  -a <apikey> -i <input file>
+#         CPEtoCVE.ps1 [-h] [-o] [-d <seconds] [-a <apikey>] -i <filename>
 ##########################################################################
 
 param (
     [alias("a")] $apikey,
     [alias("i")] $infile,
+    [alias("d")] $delay  = 1,
+    [alias("o")][switch] $outfile,
     [alias("h")][switch] $help
 )
 
 Function Get-Usage {
     Write-Output "CPEtoCVE: Collect a list of CVEs from a list of CPEs"
     Write-Output "Parameters:"
-    Write-Output "    -a <apikey>: not required"
-    Write-Output "    -i <filename>: required"
-    Write-Output "    -h: display this message`n"
-    Write-Output "Usage: cvescan [-h] [-a <apikey>] -i <filename>`n"
+    Write-Output "    -a <apikey>   : Provide user's API key [not required]"
+    Write-Output "    -i <filename> : Provide a file with CPE entries [required]"
+    Write-Output "    -d <seconds>  : delay in seconds [Default: 1]"
+    Write-Output "    -o            : Print to an output file and Stdout, renamed from input filename [Default: Stdout]"
+    Write-Output "    -h            : display this message`n"
+    Write-Output "Usage: CPEtoCVE.ps1 [-h] [-o] [-d <seconds] [-a <apikey>] -i <filename>`n"
     Exit
 }
 
 if($help -or -not ($infile)){Get-Usage}
 
-# setup
+# Setup
 $allCVEs = @()
+$apps    = Get-Content $infile
+$now     = Get-Date 
+if ($outfile){
+    $logfile = $infile.replace(".txt","_" + $now.tostring("yyy-MM-dd_hh-mm") + "_CVE.txt")
+}
 
-$apps = Get-Content $infile
-$now = Get-Date 
-$outfile = $infile.replace(".txt","_" + $now.tostring("yyy-MM-dd_hh-mm") + "_CVE.txt")
+# Handle values copied out of a spreadsheet with values contained in double quotes
+$tempCPEs = @()
+ForEach ($appCPEs in $apps) {
+    if (($appCPEs -eq "None") -or ($appCPEs -eq "")){ Continue }
+    $tempCPEs += $appCPEs.replace("`"","").split(' ')
+}
 
 # Convert CPE value to CVEs List
-foreach ($appCPE in $apps) {
+ForEach ($appCPE in $tempCPEs){
+    # Request CVEs using CPE value
     $request = "https://services.nvd.nist.gov/rest/json/cves/1.0?cpeMatchString=$appCPE&$apikey"
-
     $CVEs = (invoke-webrequest $request | ConvertFrom-Json).result.CVE_Items
     
-    foreach ($CVE in $CVEs) {
-        $allCVEs += $CVEs.cve.CVE_data_meta.ID
+    # Loop through each CVE and extract the data
+    ForEach ($CVE in $CVEs) {
+        $cveId = $CVE.cve.CVE_data_meta.ID
+        $cvssV2 = $CVE.impact.baseMetricV2.impactScore
+        $cvssV3 = $CVE.impact.baseMetricV3.impactScore
+        if ($cvssV3){            
+            #$exScore = $CVE.impact.baseMetricV3.exploitabilityScore
+            #$vecString = $CVE.impact.baseMetricV3.cvssV3.vectorString
+            $allCVEs += $cveId + " cvssV3: " + $cvssV3
+        } else{
+            #$exScore = $CVE.impact.baseMetricV2.exploitabilityScore
+            #$vecString = $CVE.impact.baseMetricV2.cvssV2.vectorString
+            $allCVEs += $cveId + " cvssV2: " + $cvssV2
+        }
     }
     
-    "CVEs for $appCPE :" | Tee-Object -Append -FilePath $outfile
-    ForEach ($c in ($allCVEs | Sort-Object | Get-Unique)){ 
-        $c | Tee-Object -Append -FilePath $outfile
+    # Write output to the sceen and also to a file in the local directory
+    if($outfile){
+        "CVEs for $appCPE :" | Tee-Object -Append -FilePath $logfile
+        ForEach ($c in ($allCVEs | Sort-Object | Get-Unique)){ 
+            $c | Tee-Object -Append -FilePath $logfile
+        }
+    }else{
+        "CVEs for $appCPE :" 
+        ForEach ($c in ($allCVEs | Sort-Object | Get-Unique)){ 
+            $c 
+        }
     }
-    Start-Sleep -s 3
+    # Add a delay to comply with API settings
+    Start-Sleep -s $delay
 }
