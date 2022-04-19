@@ -91,7 +91,7 @@ ForEach ($appCPEs in $apps) {
 ForEach ($appCPE in $tempCPEs){
     # Request CVEs using CPE value
     $request = "https://services.nvd.nist.gov/rest/json/cves/1.0?cpeMatchString=$appCPE&$apikey"
-    $CVEs = (invoke-webrequest $request | ConvertFrom-Json).result.CVE_Items
+    $CVEs = (Invoke-WebRequest $request -UseBasicParsing | ConvertFrom-Json).result.CVE_Items
     
     # Loop through each CVE and extract the data
     ForEach ($CVE in $CVEs) {
