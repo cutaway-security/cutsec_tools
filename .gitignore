@@ -3,4 +3,3 @@ ics/goose-stalker/Pipfile.lock
 
 *.swp
 .DS_Store
-*/.DS_Store
