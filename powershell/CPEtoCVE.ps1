@@ -98,14 +98,15 @@ ForEach ($appCPE in $tempCPEs){
         $cveId = $CVE.cve.CVE_data_meta.ID
         $cvssV2 = $CVE.impact.baseMetricV2.impactScore
         $cvssV3 = $CVE.impact.baseMetricV3.impactScore
+        $cveDesc = $CVE.cve.description.description_data.Where({$_.lang -eq "en"}).value
         if ($cvssV3){            
             #$exScore = $CVE.impact.baseMetricV3.exploitabilityScore
             #$vecString = $CVE.impact.baseMetricV3.cvssV3.vectorString
-            $allCVEs += $cveId + " cvssV3: " + $cvssV3
+            $allCVEs += $cveId + " cvssV3: " + $cvssV2 + " `"" + $cveDesc + "`""
         } else{
             #$exScore = $CVE.impact.baseMetricV2.exploitabilityScore
             #$vecString = $CVE.impact.baseMetricV2.cvssV2.vectorString
-            $allCVEs += $cveId + " cvssV2: " + $cvssV2
+            $allCVEs += $cveId + " cvssV2: " + $cvssV2 + " `"" + $cveDesc + "`""
         }
     }
     
@@ -123,4 +124,5 @@ ForEach ($appCPE in $tempCPEs){
     }
     # Add a delay to comply with API settings
     Start-Sleep -s $delay
+    Write-Output "`n`n"
 }
