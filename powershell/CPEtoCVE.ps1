@@ -1,6 +1,6 @@
 ##########################################################################
 # CPEtoCVE
-# Version 1.0.0
+# Version 1.0.1
 # Obtain a list of published CVEs from a list of CPEs
 #
 # Resources:
@@ -47,7 +47,7 @@ Process to obtain CPE's for software:
     Save all the CPE entries into a text file, one per line, and save.
     Run the script CPEtoCVE.ps1 (works in OSX pwsh and should work in Linux and Windows)
     CPEtoCVE.ps1 -i <cpe_file.txt> -o
-    This will write the output to the file cpe_file_<timestamp>.txt
+    This will write the output to the file cpe_file_<timestamp>.csv
 #>
 
 param (
@@ -73,11 +73,13 @@ Function Get-Usage {
 if($help -or -not ($infile)){Get-Usage}
 
 # Setup
-$allCVEs = @()
+$maxresults = 1000
+$loghead = $true
+$logheader = "CPE,CVE ID,CVSS V2,V2 Exploitability Score,V2 Vector String,CVSS V3,V3 Exploitability Score,V3 Vector String,CVE Description"
 $apps    = Get-Content $infile
 $now     = Get-Date 
 if ($outfile){
-    $logfile = $infile.replace(".txt","_" + $now.tostring("yyy-MM-dd_hh-mm") + "_CVE.txt")
+    $logfile = $infile.replace(".txt","_" + $now.tostring("yyy-MM-dd_hh-mm") + "_CVE.csv")
 }
 
 # Handle values copied out of a spreadsheet with values contained in double quotes
@@ -90,39 +92,44 @@ ForEach ($appCPEs in $apps) {
 # Convert CPE value to CVEs List
 ForEach ($appCPE in $tempCPEs){
     # Request CVEs using CPE value
-    $request = "https://services.nvd.nist.gov/rest/json/cves/1.0?cpeMatchString=$appCPE&$apikey"
+    # NIST CVE API Reference: https://nvd.nist.gov/developers/vulnerabilities
+    $request = "https://services.nvd.nist.gov/rest/json/cves/1.0?cpeMatchString=$appCPE&$apikey&resultsPerPage=$maxresults"
     $CVEs = (Invoke-WebRequest $request -UseBasicParsing | ConvertFrom-Json).result.CVE_Items
     
     # Loop through each CVE and extract the data
     ForEach ($CVE in $CVEs) {
         $cveId = $CVE.cve.CVE_data_meta.ID
         $cvssV2 = $CVE.impact.baseMetricV2.impactScore
-        $cvssV3 = $CVE.impact.baseMetricV3.impactScore
-        $cveDesc = $CVE.cve.description.description_data.Where({$_.lang -eq "en"}).value
-        if ($cvssV3){            
-            #$exScore = $CVE.impact.baseMetricV3.exploitabilityScore
-            #$vecString = $CVE.impact.baseMetricV3.cvssV3.vectorString
-            $allCVEs += $cveId + " cvssV3: " + $cvssV2 + " `"" + $cveDesc + "`""
-        } else{
-            #$exScore = $CVE.impact.baseMetricV2.exploitabilityScore
-            #$vecString = $CVE.impact.baseMetricV2.cvssV2.vectorString
-            $allCVEs += $cveId + " cvssV2: " + $cvssV2 + " `"" + $cveDesc + "`""
+        $cvssV3 = $CVE.impact.baseMetricV3.impactScore          
+        $ex2Score = $CVE.impact.baseMetricV2.exploitabilityScore         
+        $ex3Score = $CVE.impact.baseMetricV3.exploitabilityScore
+        $vec2String = $CVE.impact.baseMetricV2.cvssV2.vectorString
+        $vec3String = $CVE.impact.baseMetricV3.cvssV3.vectorString
+        # For importing to MS Excel, change description for CSV output by replacing double quotes with single quotes and commas with the pipe symbol "|"
+        $cveDesc = " `"" + $CVE.cve.description.description_data.Where({$_.lang -eq "en"}).value.replace("`"","`'").replace(",","|") + "`""
+        # Put output together here, easier to modify
+        $logoutfields = "$appCPE,$cveId,$cvssV2,$ex2Score,$vec2String,$cvssV3,$ex3Score,$vec3String,$cveDesc"
+        if($outfile){
+            # Only output log header on first pass
+            if($loghead){ 
+                Write-Output $logheader | Tee-Object -Append -FilePath $logfile
+                $loghead = $false
+            }
+            Write-Output $logoutfields | Tee-Object -Append -FilePath $logfile
+        }else{
+            # Only output log header on first pass
+            if($loghead){ 
+                Write-Output $logheader
+                $loghead = $false
+            }
+            Write-Output $logoutfields
         }
     }
     
-    # Write output to the sceen and also to a file in the local directory
-    if($outfile){
-        "CVEs for $appCPE :" | Tee-Object -Append -FilePath $logfile
-        ForEach ($c in ($allCVEs | Sort-Object | Get-Unique)){ 
-            $c | Tee-Object -Append -FilePath $logfile
-        }
-    }else{
-        "CVEs for $appCPE :" 
-        ForEach ($c in ($allCVEs | Sort-Object | Get-Unique)){ 
-            $c 
-        }
-    }
     # Add a delay to comply with API settings
     Start-Sleep -s $delay
-    Write-Output "`n`n"
+    # Give some whitespace if just printing to Stdout
+    if(!($outfile)){
+        Write-Output "`n`n"
+    }
 }
