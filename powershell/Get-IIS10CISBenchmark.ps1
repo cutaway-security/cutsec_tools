@@ -1,7 +1,7 @@
 ##########################################################################
-# Get-IISSecurityCheck
+# Get-IIS10CISBenchmark
 # Version 1.0.0
-# Review the configuration of a Windows IIS Server and site configurations.
+# Review the configuration of a Windows IIS 10 Server and site configurations.
 # 
 # Author: Don C. Weber (@cutaway) - Cutaway Security, LLC
 # Date:   20220502
@@ -11,7 +11,7 @@
 # 
 # Usage:
 #     1) Start Powershell
-#     2) Run '..\Get-IISSecurityCheck.ps1'
+#     2) Run '..\Get-IIS10CISBenchmark.ps1'
 #     3) Review each output that starts with '[-]' to determine if it is a false positive.
 #     4) For references and remediations check script section for links to STIG Viewer and other resources.
 #
@@ -73,7 +73,7 @@ Write-Output "###################################"
 
 ###################
 # STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-06-08/finding/V-100225
-Write-Output "`n[*] Ensure Web content is on a Non-System Partition"
+Write-Output "`n[*] Ensure Web content is on a Non-System Partition: CIS 1.1"
 ###################
 $test = Get-Content (Join-Path -Path $Env:SystemRoot -ChildPath 'System32\inetsrv\config\applicationHost.config')
 $iisPath = Join-Path -Path $Env:SystemDrive -ChildPath 'inetpub'
@@ -88,8 +88,25 @@ if (
 }
 
 ###################
+# STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-06-08/finding/V-100225
+Write-Output "`n[*] Ensure host headers are on all sites: CIS 1.2"
+###################
+Get-Website | Foreach-Object {
+    $appName = $_.Name
+    $hostHeaderData = ((Get-IISSiteBinding $appName))
+    ForEach ($h in $hostHeaderData){
+        $hostHeader = ($h.bindingInformation).Split(':')[2]
+        if ($hostHeader){
+            Write-Output "[+] $appName Host Header is enabled for: $h"
+        } else {
+            Write-Output "[-] $appName Host Header is NOT enabled for: $h"
+        }
+    }
+}
+
+###################
 # STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218759
-Write-Output "`n[*] Ensure Directory Browsing is Set to Disable"
+Write-Output "`n[*] Ensure Directory Browsing is Set to Disable: CIS 1.3"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.Name
@@ -103,7 +120,7 @@ Get-Website | Foreach-Object {
 
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218771
-Write-Output "`n[*] Ensure Application pool identity is configured for all application pools"
+Write-Output "`n[*] Ensure Application pool identity is configured for all application pools: CIS 1.4"
 ###################
 $AppPools = Get-ChildItem 'IIS:\AppPools'
 $AppPools | Where-Object {!($_.Name -match '.NET')} | Foreach-Object {
@@ -119,7 +136,7 @@ $AppPools | Where-Object {!($_.Name -match '.NET')} | Foreach-Object {
 
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218771
-Write-Output "`n[*] Ensure unique application pools is set for sites"
+Write-Output "`n[*] Ensure unique application pools is set for sites: CIS 1.5"
 ###################
 $websiteCnt = (Get-Website).count
 $appPoolCnt = ((get-iisapppool).Name | Where-Object {!($_ -match '.NET')}).count
@@ -133,7 +150,7 @@ if ($websiteCnt -eq $appPoolCnt){
 
 ###################
 # STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2021-03-24/finding/V-218750
-Write-Output "`n[*] Ensure application pool identity is configured for anonymous user identity"
+Write-Output "`n[*] Ensure application pool identity is configured for anonymous user identity: CIS 1.6"
 ###################
 Get-ChildItem 'IIS:\Sites' | Foreach-Object {
     $appName = $_.Name
@@ -153,7 +170,7 @@ Get-ChildItem 'IIS:\Sites' | Foreach-Object {
 
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218746
-Write-Output "`n[*] Ensure WebDav feature is disabled"
+Write-Output "`n[*] Ensure WebDav feature is disabled: CIS 1.7"
 ###################
 $webDavEnabled = [Bool](Get-WindowsFeature -Name 'Web-DAV-Publishing' | Where-Object Installed -EQ $true)
 if ($webDavEnabled){
@@ -164,7 +181,7 @@ if ($webDavEnabled){
 
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_server/2021-03-24/finding/V-218825
-Write-Output "`n[*] Ensure global authorization rule is set to restrict access"
+Write-Output "`n[*] Ensure global authorization rule is set to restrict access: CIS 2.1"
 ###################
 if ((Get-WindowsFeature Web-Url-Auth).Installed -EQ $true) {
     Get-WebSite | ForEach-Object {
@@ -188,7 +205,7 @@ if ((Get-WindowsFeature Web-Url-Auth).Installed -EQ $true) {
 
 ###################
 # General: Websites should require authentication, where possible.
-Write-Output "`n[*] Ensure access to sensitive site features is restricted to authenticated principals only"
+Write-Output "`n[*] Ensure access to sensitive site features is restricted to authenticated principals only: CIS 2.2"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.name
@@ -205,7 +222,7 @@ Get-Website | Foreach-Object {
 # General: Websites with forms require sessions management mechanisms are protected
 # STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218770
 # STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218736
-Write-Output "`n[*] Ensure forms authentication requires SSL and Cookies and Cookie Protection"
+Write-Output "`n[*] Ensure forms authentication requires SSL and Cookies and Cookie Protection: CIS 2.3, 2.4, 2.5, 2.7"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.name
@@ -257,23 +274,8 @@ Get-Website | Foreach-Object {
 }
 
 ###################
-# General: Websites with forms require sessions management mechanisms are protected
-# STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218770
-# STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218736
-Write-Output "`n[*] Ensure machine setting for passwordFormat is not set to clear"
-###################
-$machineConfig = [System.Configuration.ConfigurationManager]::OpenMachineConfiguration()
-$passwordFormat = $machineConfig.GetSection("system.web/authentication").forms.credentials.passwordFormat
-
-if ($passwordFormat -eq 'SHA1'){
-    Write-Output "[+] Machine configuration for forms authentication passwordFormat set to protected"
-} else {
-    Write-Output "[-] Machine configuration for forms authentication passwordFormat NOT set to protected (is set clear or MD5)"
-}
-
-###################
 # General: Basic authentication should be encrypted.
-Write-Output "`n[*] Ensure transport layer security for basic authentication is configured"
+Write-Output "`n[*] Ensure transport layer security for basic authentication is configured: CIS 2.6"
 ###################
 Get-Website | Foreach-Object {
     $ssl   = (Get-WebConfiguration -Filter "/system.webServer/security/access" -PSPath "IIS:\sites\$($_.Name)").SSLFlags
@@ -289,11 +291,26 @@ Get-Website | Foreach-Object {
         Write-Output "[+] $appName does not use basic authentication"
     }
 }
+
+###################
+# General: Websites with forms require sessions management mechanisms are protected
+# STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218770
+# STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218736
+Write-Output "`n[*] Ensure machine setting for passwordFormat is not set to clear: CIS 2.8"
+###################
+$machineConfig = [System.Configuration.ConfigurationManager]::OpenMachineConfiguration()
+$passwordFormat = $machineConfig.GetSection("system.web/authentication").forms.credentials.passwordFormat
+
+if ($passwordFormat -eq 'SHA1'){
+    Write-Output "[+] Machine configuration for forms authentication passwordFormat set to protected"
+} else {
+    Write-Output "[-] Machine configuration for forms authentication passwordFormat NOT set to protected (is set clear or MD5)"
+}
         
 ###################
 # General: Enabling retail mode configures the server to prevent displaying some error messages to end user
 # Microsoft: https://docs.microsoft.com/en-us/dotnet/api/system.web.configuration.deploymentsection.retail?view=netframework-4.8
-Write-Output "`n[*] Ensure machine setting for deployment method retail is set"
+Write-Output "`n[*] Ensure machine setting for deployment method retail is set: CIS 3.1"
 ###################
 $machineConfig = [System.Configuration.ConfigurationManager]::OpenMachineConfiguration()
 $deployment = $machineConfig.GetSection("system.web/deployment")
@@ -308,7 +325,7 @@ if ($retail){
 
 ###################
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure debugging is turned off"
+Write-Output "`n[*] Ensure debugging is turned off: CIS 3.2"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.name
@@ -323,7 +340,7 @@ Get-Website | Foreach-Object {
 
 ###################
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure custom error messages are not off"
+Write-Output "`n[*] Ensure custom error messages are not off: CIS 3.3"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.name
@@ -338,7 +355,7 @@ Get-Website | Foreach-Object {
 
 ###################
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure IIS HTTP detailed errors are hidden from displaying remotely"
+Write-Output "`n[*] Ensure IIS HTTP detailed errors are hidden from displaying remotely: CIS 3.4"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.name
@@ -353,7 +370,7 @@ Get-Website | Foreach-Object {
 
 ###################
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure ASP.NET stack tracing is not enabled"
+Write-Output "`n[*] Ensure ASP.NET stack tracing is not enabled: CIS 3.5"
 ###################
 # Individual Site Config
 Get-Website | Foreach-Object {
@@ -379,7 +396,7 @@ if ($deployment.enabled){
 ###################
 # STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218736
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure httpcookie mode is configured for session state"
+Write-Output "`n[*] Ensure httpcookie mode is configured for session state: CIS 3.6, 3.7"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.Name
@@ -408,7 +425,7 @@ Get-Website | Foreach-Object {
 
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_server/2021-03-24/finding/V-218807
-Write-Output "`n[*] Ensure Site MachineKey validation method - .Net 4.5 is configured"
+Write-Output "`n[*] Ensure Site MachineKey validation method - .Net 3.5/4.5 is configured: CIS 3.8, 3.9"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.name
@@ -429,10 +446,6 @@ Get-Website | Foreach-Object {
     }
 }
 
-###################
-# STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_server/2021-03-24/finding/V-218807
-Write-Output "`n[*] Ensure IIS MachineKey validation method - .Net 4.5 is configured"
-###################
 $machineKeyValidation = (Get-WebConfiguration -filter "system.web/machineKey").validation
 $machineKeyDecryption = (Get-WebConfiguration -filter "system.web/machineKey").decryption
 
@@ -451,7 +464,7 @@ if ($siteKeyDecryption -eq 'Auto'){
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/iis_8.5_site/2018-04-06/finding/V-76805
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure site global .NET trust level setting is configured"
+Write-Output "`n[*] Ensure site global .NET trust level setting is configured: CIS 3.10"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.name
@@ -464,11 +477,6 @@ Get-Website | Foreach-Object {
     }
 }
 
-###################
-# STIG Viewer: https://www.stigviewer.com/stig/iis_8.5_site/2018-04-06/finding/V-76805
-# PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure IIS global .NET trust level setting is configured"
-###################
 $level = (Get-WebConfiguration -filter "system.web/trust" -PSPath "IIS:\sites\$appName" | Select-Object -Property *).level
 if (($level -eq 'Full') -or ($level -eq 'High')){
     Write-Output "[-] IIS Trust Level NOT set to Medium or lower: $level"
@@ -478,7 +486,7 @@ if (($level -eq 'Full') -or ($level -eq 'High')){
 
 ###################
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure X-Powered-By Header and Server Headers are removed"
+Write-Output "`n[*] Ensure X-Powered-By Header and Server Headers are removed: CIS 3.11, 3.12"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.Name
@@ -508,7 +516,7 @@ Get-Website | Foreach-Object {
 
 ###################
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure Request Filterings are configured"
+Write-Output "`n[*] Ensure Request Filterings are configured: CIS 4.1, 4.2, 4.3, 4.4, 4.5"
 ###################
 If ((Get-WindowsFeature Web-Filtering).Installed -EQ $true) {
     Get-Website | Foreach-Object {
@@ -589,7 +597,7 @@ If ((Get-WindowsFeature Web-Filtering).Installed -EQ $true) {
 
 ###################
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure HTTP Trace Method is disabled"
+Write-Output "`n[*] Ensure HTTP Trace Method is disabled: CIS 4.6"
 ###################
 If ((Get-WindowsFeature Web-Filtering).Installed -EQ $true) {
     Get-Website | Foreach-Object {
@@ -610,13 +618,17 @@ If ((Get-WindowsFeature Web-Filtering).Installed -EQ $true) {
 }
 
 ###################
+Write-Output "`n[*] Ensure Unlisted File Extensions are not allowed: CIS 4.7"
+###################
+Write-Output "TODO: Manual review"
+
+###################
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
 # Microsoft IIS Handlers: https://docs.microsoft.com/en-us/iis/configuration/system.webserver/handlers/
-Write-Output "`n[*] Ensure Site Handler is not granted Write and Script/Execute"
+Write-Output "`n[*] Ensure Site Handler is not granted Write and Script/Execute: CIS 4.8"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.Name
-
     $granted = (Get-WebConfiguration -Filter 'system.webServer/handlers' -PSPath "IIS:\sites\$appName").accessPolicy
 
     # TODO: What should this be?
@@ -626,13 +638,6 @@ Get-Website | Foreach-Object {
         Write-Output "[-] $appName Handler NOT set for Read/Script: $granted"
     }
 }
-
-###################
-# PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-# Microsoft IIS Handlers: https://docs.microsoft.com/en-us/iis/configuration/system.webserver/handlers/
-Write-Output "`n[*] Ensure IIS Handler is not granted Write and Script/Execute"
-###################
-$appName = $_.Name
 
 $granted = (Get-WebConfiguration -Filter 'system.webServer/handlers').accessPolicy
 
@@ -645,7 +650,7 @@ if ($granted -eq 'Read/Script'){
 
 ###################
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure site configurations for notListedIsapisAllowed and notListedCgisAllowed are set to false"
+Write-Output "`n[*] Ensure site configurations for notListedIsapisAllowed and notListedCgisAllowed are set to false: CIS 4.9, 4.10"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.Name
@@ -665,10 +670,6 @@ Get-Website | Foreach-Object {
     }
 }
 
-###################
-# PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure IIS configurations for notListedIsapisAllowed and notListedCgisAllowed are set to false"
-###################
 $isapisAllowed = (Get-WebConfiguration -Filter 'system.webServer/security/isapiCgiRestriction').notListedIsapisAllowed
 $cgisAllowed = (Get-WebConfiguration -Filter 'system.webServer/security/isapiCgiRestriction').notListedCgisAllowed
 
@@ -686,7 +687,7 @@ if ($cgisAllowed){
 
 ###################
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure Dynamic IP Address Restrictions is enabled"
+Write-Output "`n[*] Ensure Dynamic IP Address Restrictions is enabled: CIS 4.11"
 ###################
 If ((Get-WindowsFeature Web-Ip-Security).Installed -EQ $true) {
     Get-Website | Foreach-Object {
@@ -713,7 +714,7 @@ If ((Get-WindowsFeature Web-Ip-Security).Installed -EQ $true) {
 ###################
 # STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218765
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure Site weblog configuration"
+Write-Output "`n[*] Ensure Site weblog configuration: CIS 5.1, 5.2, 5.3"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.Name
@@ -746,11 +747,6 @@ Get-Website | Foreach-Object {
     }
 }
 
-###################
-# STIG Viewer: https://stigviewer.com/stig/microsoft_iis_10.0_site/2020-09-25/finding/V-218765
-# PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Ensure Default IIS weblog configuration"
-###################
 $appLogSetting = (Get-WebConfiguration -Filter system.webServer/httpLogging).dontLog 
 $appSelectiveSetting  = (Get-WebConfiguration -Filter system.webServer/httpLogging).selectiveLogging
 $logDir = (Get-WebConfiguration -Filter "system.applicationHost/sites/siteDefaults/logFile").directory
@@ -782,8 +778,9 @@ if ($etwLogging -eq 'File,ETW'){
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_windows_server_2019/2020-10-26/finding/V-205853
 # PowerShell IIS Hardening: https://github.com/zahav/powershell-iis-hardening
-Write-Output "`n[*] Check FTP configurations"
+Write-Output "`n[*] Check FTP configurations: CIS 6.1, 6.2"
 ###################
+# FIXME: This test needs to be updated to match the format of other test outputs
 Get-Website | Foreach-Object {
     $appName = $_.Name
     $FTPBindings = $site.bindings.collection | Where-Object -Property 'Protocol' -eq FTP
@@ -814,7 +811,7 @@ Get-Website | Foreach-Object {
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_server/2021-06-23/finding/V-218827
 # Microsoft HSTS Settings for a Website: https://docs.microsoft.com/en-us/iis/configuration/system.applicationhost/sites/site/hsts
-Write-Output "`n[*] Ensure HSTS Header is set"
+Write-Output "`n[*] Ensure HSTS Header is set: CIS 7.1"
 ###################
 Get-Website | Foreach-Object {
     $appName = $_.Name
@@ -851,7 +848,7 @@ Get-Website | Foreach-Object {
 
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_server/2021-03-24/finding/V-218821
-Write-Output "`n[*] Ensure SSLv2 is Disabled"
+Write-Output "`n[*] Ensure SSLv2 is Disabled: CIS 7.2"
 ###################
 $path = "HKLM:\System\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0"
 
@@ -873,7 +870,7 @@ If ((Test-Path -Path $path) -and (Test-Path -Path "$path\Server")) {
 
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_server/2021-03-24/finding/V-218821
-Write-Output "`n[*] Ensure SSLv3 is Disabled"
+Write-Output "`n[*] Ensure SSLv3 is Disabled: CIS 7.3"
 ###################
 $path = "HKLM:\System\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 3.0"
 
@@ -895,7 +892,7 @@ If ((Test-Path -Path $path) -and (Test-Path -Path "$path\Server")) {
 
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_server/2021-03-24/finding/V-218821
-Write-Output "`n[*] Ensure TLS 1.0 is Disabled"
+Write-Output "`n[*] Ensure TLS 1.0 is Disabled: CIS 7.4"
 ###################
 $path = "HKLM:\System\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.0\Server"
 
@@ -917,7 +914,7 @@ If ((Test-Path -Path $path)) {
 
 ###################
 # STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_server/2021-03-24/finding/V-218821
-Write-Output "`n[*] Ensure TLS 1.1 is Disabled"
+Write-Output "`n[*] Ensure TLS 1.1 is Disabled: CIS 7.5"
 ###################
 $path = "HKLM:\System\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\TLS 1.1\Server"
 
@@ -936,6 +933,13 @@ If ((Test-Path -Path $path)) {
 } else {
     Write-Output "[-] $path keys not found, therefore TLSv1.1 is NOT disabled"
 }
+
+
+###################
+# STIG Viewer: https://www.stigviewer.com/stig/microsoft_iis_10.0_server/2021-03-24/finding/V-218821
+Write-Output "`n[*] Ensure TLS 1.1 is Disabled: CIS 7.6, 7.7, 7.8, 7.9, 7.10, 7.11, 7.12"
+###################
+Write-Output "TODO: Manual review"
 
 
 ###################
