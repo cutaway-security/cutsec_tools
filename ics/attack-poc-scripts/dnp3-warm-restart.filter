@@ -9,9 +9,15 @@
 # Calculating DNP3 CRC using Python
 # import crcmod.predefined
 # crcdnp = crcmod.predefined.mkCrcFun('crc-16-dnp')
-# data = '\xc0\xc0\x0e'
-# hex(crcdnp(bytes.fromhex(data)))
-# '0xdc7e' <- Output. Flip these bytes for the packet data '\x7e\xdc' 
+# cnt_bytes = ['c0','c1','c2','c3','c4','c5','c6','c7','c8','c9','ca','cb','cc','cd','ce','cf']
+# for e in c:
+# data = 'c0c00d'
+# for e in cnt_bytes:
+#     print('%s: %s'%(e,hex(crcdnp(bytes.fromhex('c0' + e + '0e')))))
+#
+# c0: 0xdc7e <- Output. Flip these bytes for the packet data '\x7e\xdc'
+# ..
+# cf: 0x348b
 ###########################################
 
 # Checking to see if the destination is the server and the protocol is DNP3
