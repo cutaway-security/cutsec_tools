@@ -1,0 +1,24 @@
+###########################################
+# Name: dnp3-store-data.filter
+# Description: Log data in DNP3 messages for modification
+#
+# Created by: Don C. Weber (@cutaway)
+# Date Created: November 2022
+# Version: 0.1
+###########################################
+
+# Checking to see if the destination is the server and the protocol is DNP3
+# Note: The IP address will need to be updated for your server
+
+if (ip.dst == '192.168.0.21') {
+    if (tcp.src == 20000) {
+        # Check for DNP3 message and a DNP3 data with length 101 (0x65) and Control Byte is 0x44. 
+        if (DATA.data == "\x05\x64\x65\x44"){
+            # Log DNP3 packet data
+            # To log data the /tmp/ettercap must be chmodded to 777 to that the nobody user can write
+            log(DATA.data,"/tmp/ettercap/ettercap_dnp3_data.dat");
+            # Printing a message when the filter fires.
+            msg("DNP3 Packet Logged");
+        }
+    }
+}
