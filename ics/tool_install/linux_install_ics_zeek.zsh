@@ -169,7 +169,7 @@ LOADZEEK='
 @load /home/kali/Tools/ics-zeek/icsnpp-enip/scripts/\n
 @load /home/kali/Tools/ics-zeek/icsnpp-ethercat/scripts/\n
 @load /home/kali/Tools/ics-zeek/icsnpp-modbus/scripts/\n
-@load /home/kali/Tools/ics-zeek/iicsnpp-opcua-binary/scripts/\n
+@load /home/kali/Tools/ics-zeek/icsnpp-opcua-binary/scripts/\n
 '
 cd $TOOLDIR
 echo $LOADZEEK >load.zeek
