@@ -158,19 +158,19 @@ done
 # Prepare a load.zeek file to load packages
 
 echo $_ITEM$_INSTALL_COMMENT'Generating load.zeek file...'
-LOADZEEK='
-@load /home/kali/Tools/ics-zeek/bzar/scripts/\n
-@load /home/kali/Tools/ics-zeek/find_smbv1/scripts/\n
-@load /home/kali/Tools/ics-zeek/smbfp/scripts/\n
-@load /home/kali/Tools/ics-zeek/icsnpp-bacnet/scripts/\n
-@load /home/kali/Tools/ics-zeek/icsnpp-bsap-ip/scripts/\n
-@load /home/kali/Tools/ics-zeek/icsnpp-bsap-serial/scripts/\n
-@load /home/kali/Tools/ics-zeek/icsnpp-dnp3/scripts/\n
-@load /home/kali/Tools/ics-zeek/icsnpp-enip/scripts/\n
-@load /home/kali/Tools/ics-zeek/icsnpp-ethercat/scripts/\n
-@load /home/kali/Tools/ics-zeek/icsnpp-modbus/scripts/\n
-@load /home/kali/Tools/ics-zeek/iicsnpp-opcua-binary/scripts/\n
-'
+LOADZEEK="
+@load ${TOOLDIR}/bzar/scripts/
+@load ${TOOLDIR}/find_smbv1/scripts/
+@load ${TOOLDIR}/smbfp/scripts/
+@load ${TOOLDIR}/icsnpp-bacnet/scripts/
+@load ${TOOLDIR}/icsnpp-bsap-ip/scripts/
+@load ${TOOLDIR}/icsnpp-bsap-serial/scripts/
+@load ${TOOLDIR}/icsnpp-dnp3/scripts/
+@load ${TOOLDIR}/icsnpp-enip/scripts/
+@load ${TOOLDIR}/icsnpp-ethercat/scripts/
+@load ${TOOLDIR}/icsnpp-modbus/scripts/
+@load ${TOOLDIR}/icsnpp-opcua-binary/scripts/
+"
 cd $TOOLDIR
 echo $LOADZEEK >load.zeek
 
